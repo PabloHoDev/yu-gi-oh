@@ -47,6 +47,10 @@ function tributeText(count: number): string {
   return count === 1 ? 'tributou 1 monstro e ' : `tributou ${count} monstros e `;
 }
 
-export function describeEvents(events: readonly DuelEvent[], viewer: PlayerId, names: readonly [string, string]): string[] {
+export function describeEvents(
+  events: readonly DuelEvent[],
+  viewer: PlayerId,
+  names: readonly [string, string],
+): string[] {
   return events.map((event) => describeEvent(event, viewer, names)).filter((text): text is string => text !== null);
 }
