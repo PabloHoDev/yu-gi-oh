@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DECKS } from '../duel/cards';
 import { ACADEMY_ISLAND } from './academyIsland';
-import { isSolid, mapSize, tileData, type MapDef } from './maps';
+import { isSolid, type MapDef, mapSize, tileData } from './maps';
 
 const MAPS: MapDef[] = [ACADEMY_ISLAND];
 
@@ -24,7 +24,7 @@ describe.each(MAPS)('mapa $id', (map) => {
       const key = `${npc.x},${npc.y}`;
       expect(seen.has(key), npc.id).toBe(false);
       seen.add(key);
-      if (npc.duel) expect(DECKS[npc.duel.deck]).toBeDefined();
+      if (npc.duel) expect(DECKS[npc.duel.deck], npc.id).toBeDefined();
     }
   });
 
