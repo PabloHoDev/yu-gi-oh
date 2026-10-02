@@ -1,0 +1,48 @@
+{
+  "starter": {
+    "name": "Deck Inicial do Slifer",
+    "cards": {
+      "elemental-hero-sparkman": 3,
+      "elemental-hero-clayman": 3,
+      "elemental-hero-avian": 2,
+      "elemental-hero-burstinatrix": 2,
+      "elemental-hero-neos": 1,
+      "dark-blade": 3,
+      "warrior-dai-grepher": 3,
+      "sonic-duck": 3,
+      "jerry-beans-man": 2,
+      "giant-soldier-of-stone": 3,
+      "mystical-elf": 2,
+      "celtic-guardian": 2,
+      "warrior-of-zera": 2,
+      "robotic-knight": 2,
+      "gazelle-the-king-of-mythical-beasts": 2,
+      "alligator-s-sword": 2,
+      "harpie-lady": 1,
+      "summoned-skull": 2
+    }
+  },
+  "obeliskStudent": {
+    "name": "Elite do Obelisk",
+    "cards": {
+      "luster-dragon": 1,
+      "battle-ox": 3,
+      "la-jinn-the-mystical-genie-of-the-lamp": 1,
+      "x-head-cannon": 1,
+      "neo-the-magic-swordsman": 3,
+      "zure-knight-of-dark-world": 2,
+      "v-tiger-jet": 3,
+      "robotic-knight": 3,
+      "harpie-lady": 3,
+      "celtic-guardian": 3,
+      "alligator-s-sword": 3,
+      "acrobat-monkey": 2,
+      "mystical-elf": 3,
+      "giant-soldier-of-stone": 3,
+      "cyber-tech-alligator": 1,
+      "luster-dragon-2": 1,
+      "blue-eyes-white-dragon": 1,
+      "gazelle-the-king-of-mythical-beasts": 3
+    }
+  }
+}
