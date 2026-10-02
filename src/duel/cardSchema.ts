@@ -4,6 +4,9 @@ import { z } from 'zod';
  * Formato de uma carta em data/cards/cards.json. É a fonte da verdade dos tipos
  * de carta: o script de importação grava neste formato e os testes validam o
  * arquivo contra ele.
+ *
+ * O jogo importa daqui apenas tipos (`import type`), para o Zod não entrar no
+ * pacote final enquanto não for necessário em tempo de execução.
  */
 
 export const ATTRIBUTES = ['DARK', 'DIVINE', 'EARTH', 'FIRE', 'LIGHT', 'WATER', 'WIND'] as const;
@@ -60,12 +63,3 @@ export type MonsterCard = z.infer<typeof monsterCardSchema>;
 export type SpellCard = z.infer<typeof spellCardSchema>;
 export type TrapCard = z.infer<typeof trapCardSchema>;
 export type AnyCard = z.infer<typeof cardSchema>;
-
-/**
- * Cartas que o motor de duelo já sabe jogar. Hoje: Monstros Normais.
- * Amplie aqui à medida que o motor ganhar efeitos, magias, armadilhas e fusões;
- * os decks só podem conter cartas jogáveis (há teste para isso).
- */
-export function isPlayable(card: AnyCard): card is MonsterCard {
-  return card.kind === 'monster' && card.frame === 'normal';
-}
