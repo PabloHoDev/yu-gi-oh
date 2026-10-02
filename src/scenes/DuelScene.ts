@@ -2,10 +2,12 @@ import Phaser from 'phaser';
 import { BOX_CHARS, BOX_HEIGHT, BOX_LINES, BOX_PADDING, BOX_Y, GAME_WIDTH } from '../config';
 import { pickTributes, runAiStep } from '../duel/ai';
 import { buildDeck } from '../duel/cards';
-import { describeEvents } from '../duel/describe';
+import { describeEvent } from '../duel/describe';
 import { Duel, DuelError, MONSTER_ZONES, type SummonMode, tributesRequired } from '../duel/engine';
-import type { Attribute, DuelEvent, FieldMonster, Phase, PlayerId } from '../duel/types';
+import type { DuelEvent, FieldMonster, Phase, PlayerId } from '../duel/types';
+import { setCardArt } from '../gfx/cardArt';
 import { Controls } from '../input/Controls';
+import { DuelStage } from '../ui/DuelStage';
 import { drawPanel, makeText } from '../ui/panel';
 import { paginate, truncate } from '../ui/text';
 import type { Direction, NpcDuel } from '../world/maps';
@@ -14,6 +16,8 @@ import { SceneKey } from './keys';
 export interface DuelSceneData {
   npcId: string;
   opponent: NpcDuel;
+  /** Sprite de mapa do oponente, mostrado quando ele sofre um ataque direto. */
+  opponentSprite: string;
 }
 
 export interface DuelSceneResult {
@@ -23,22 +27,16 @@ export interface DuelSceneResult {
 
 const HUMAN: PlayerId = 0;
 const RIVAL: PlayerId = 1;
+const PLAYERS = [HUMAN, RIVAL] as const;
 
 const ZONE_SPACING = 34;
 const ZONE_FIRST_X = GAME_WIDTH / 2 - ZONE_SPACING * 2;
 /** Centro vertical da fileira de monstros de cada jogador (humano embaixo, rival em cima). */
 const ROW_Y: Readonly<Record<PlayerId, number>> = { 0: 67, 1: 25 };
-const INFO_Y: Readonly<Record<PlayerId, number>> = { 0: 98, 1: 2 };
-
-const ATTRIBUTE_COLOR: Readonly<Record<Attribute, number>> = {
-  DARK: 0x7048a8,
-  DIVINE: 0xd8a030,
-  EARTH: 0x987848,
-  FIRE: 0xe05030,
-  LIGHT: 0xf8e870,
-  WATER: 0x4088e0,
-  WIND: 0x58c078,
-};
+const INFO_Y: Readonly<Record<PlayerId, number>> = { 0: 99, 1: 2 };
+/** Cor de cada duelista no campo: azul para o jogador, vermelho para o rival. */
+const SIDE_COLOR: Readonly<Record<PlayerId, number>> = { 0: 0x3870d8, 1: 0xc83848 };
+const THUMB_SIZE = 16;
 
 const PHASE_LABEL: Readonly<Record<Phase, string>> = {
   main1: 'FASE PRINCIPAL 1',
@@ -48,8 +46,18 @@ const PHASE_LABEL: Readonly<Record<Phase, string>> = {
 
 const MENU = ['INVOCAR', 'ATACAR', 'POSIÇÃO', 'ENCERRAR'] as const;
 
+/** Uma fala da narração; com `event`, o palco mostra a cena correspondente. */
+type Line = string | { text: string; event: DuelEvent };
+
+interface Page {
+  text: string;
+  event?: DuelEvent;
+  /** Continuação de uma fala longa: mantém o palco como está. */
+  continuation: boolean;
+}
+
 type UiState =
-  | { kind: 'messages'; pages: string[]; index: number; then: () => void }
+  | { kind: 'messages'; pages: Page[]; index: number; then: () => void }
   | { kind: 'menu'; index: number }
   | { kind: 'hand'; index: number }
   | { kind: 'summonMode'; handIndex: number; tributes: number[]; index: number }
@@ -70,9 +78,11 @@ export class DuelScene extends Phaser.Scene {
   private state: UiState = { kind: 'closing' };
 
   private field!: Phaser.GameObjects.Graphics;
+  private stage!: DuelStage;
   private boxText!: Phaser.GameObjects.Text;
   private infoTexts!: Record<PlayerId, Phaser.GameObjects.Text>;
   private valueTexts!: Record<PlayerId, Phaser.GameObjects.Text[]>;
+  private thumbs!: Record<PlayerId, Phaser.GameObjects.Image[]>;
 
   constructor() {
     super(SceneKey.Duel);
@@ -95,15 +105,21 @@ export class DuelScene extends Phaser.Scene {
     drawPanel(box, 0, BOX_Y, GAME_WIDTH, BOX_HEIGHT);
     this.boxText = makeText(this, BOX_PADDING, BOX_Y + BOX_PADDING);
 
-    const zoneTexts = (player: PlayerId) =>
-      Array.from({ length: MONSTER_ZONES }, (_, zone) =>
-        makeText(this, zoneX(zone), ROW_Y[player] + 15, '', '#f8f8f8').setOrigin(0.5, 0),
-      );
+    const perZone = <T>(make: (player: PlayerId, zone: number) => T): Record<PlayerId, T[]> => {
+      const row = (player: PlayerId) => Array.from({ length: MONSTER_ZONES }, (_, zone) => make(player, zone));
+      return { 0: row(HUMAN), 1: row(RIVAL) };
+    };
+    this.thumbs = perZone((player, zone) =>
+      this.add.image(zoneX(zone), ROW_Y[player], 'cardBack').setDisplaySize(THUMB_SIZE, THUMB_SIZE).setVisible(false),
+    );
+    this.valueTexts = perZone((player, zone) =>
+      makeText(this, zoneX(zone), ROW_Y[player] + 15, '', '#f8f8f8').setOrigin(0.5, 0),
+    );
     this.infoTexts = {
       0: makeText(this, 4, INFO_Y[0], '', '#f8f8f8'),
       1: makeText(this, 4, INFO_Y[1], '', '#f8f8f8'),
     };
-    this.valueTexts = { 0: zoneTexts(HUMAN), 1: zoneTexts(RIVAL) };
+    this.stage = new DuelStage(this, HUMAN, ['player', data.opponentSprite]);
 
     const opening = this.duel.start();
     this.say(['Duelo!', ...this.describe(opening)], () => this.openMenu());
@@ -120,8 +136,13 @@ export class DuelScene extends Phaser.Scene {
       case 'messages':
         if (!confirm) return;
         state.index += 1;
-        if (state.index >= state.pages.length) state.then();
-        else this.render();
+        if (state.index >= state.pages.length) {
+          this.stage.hide();
+          state.then();
+        } else {
+          this.showPage(state.pages[state.index]);
+          this.render();
+        }
         return;
 
       case 'menu':
@@ -265,9 +286,6 @@ export class DuelScene extends Phaser.Scene {
   }
 
   private narrate(events: DuelEvent[]): void {
-    if (events.some((event) => event.type === 'damage' && event.player === HUMAN)) {
-      this.cameras.main.shake(200, 0.01);
-    }
     this.say(this.describe(events), () => {
       if (this.duel.winner !== null) this.finish();
       else if (this.duel.active === HUMAN) this.openMenu();
@@ -288,18 +306,34 @@ export class DuelScene extends Phaser.Scene {
 
   // ------------------------------------------------------------- interface
 
-  private describe(events: DuelEvent[]): string[] {
-    return describeEvents(events, HUMAN, this.names);
+  private describe(events: DuelEvent[]): Line[] {
+    return events.flatMap((event) => {
+      const text = describeEvent(event, HUMAN, this.names);
+      return text === null ? [] : [{ text, event }];
+    });
   }
 
-  private say(messages: string[], then: () => void): void {
-    const pages = messages.flatMap((message) => paginate(message, BOX_CHARS, BOX_LINES));
+  private say(lines: Line[], then: () => void): void {
+    const pages = lines.flatMap((line) => {
+      const { text, event } = typeof line === 'string' ? { text: line, event: undefined } : line;
+      return paginate(text, BOX_CHARS, BOX_LINES).map(
+        (page, index): Page => ({ text: page, event: index === 0 ? event : undefined, continuation: index > 0 }),
+      );
+    });
     if (pages.length === 0) {
       this.render();
       then();
       return;
     }
+    this.showPage(pages[0]);
     this.setState({ kind: 'messages', pages, index: 0, then });
+  }
+
+  /** Põe no palco a cena da fala que vai aparecer (ou limpa o palco, se a fala não tem cena). */
+  private showPage(page: Page | undefined): void {
+    if (!page || page.continuation) return;
+    if (page.event) this.stage.present(page.event);
+    else this.stage.hide();
   }
 
   private openMenu(index = 0): void {
@@ -332,7 +366,7 @@ export class DuelScene extends Phaser.Scene {
 
     switch (state.kind) {
       case 'messages':
-        return state.pages[state.index] ?? '';
+        return state.pages[state.index]?.text ?? '';
 
       case 'menu': {
         const option = (i: number) => `${cursor(state.index === i)}${(MENU[i] as string).padEnd(11)}`;
@@ -398,28 +432,37 @@ export class DuelScene extends Phaser.Scene {
     }
   }
 
+  /** Arena de duelo: piso escuro com as zonas de cada duelista delineadas na cor dele. */
   private drawField(): void {
     const g = this.field;
     g.clear();
-    g.fillStyle(0x205040).fillRect(0, 0, GAME_WIDTH, BOX_Y);
-    g.fillStyle(0x183830).fillRect(0, 0, GAME_WIDTH, 11);
-    g.fillStyle(0x183830).fillRect(0, 96, GAME_WIDTH, BOX_Y - 96);
-    g.fillStyle(0x70a888).fillRect(0, 50, GAME_WIDTH, 1);
+    g.fillStyle(0x101830).fillRect(0, 0, GAME_WIDTH, BOX_Y);
+    g.fillStyle(0x182448).fillRect(0, 11, GAME_WIDTH, 39).fillRect(0, 51, GAME_WIDTH, 46);
+    g.fillStyle(0x58c8f8).fillRect(0, 50, GAME_WIDTH, 1);
+    for (const player of PLAYERS) {
+      g.fillStyle(SIDE_COLOR[player]).fillRect(0, player === RIVAL ? 10 : 97, GAME_WIDTH, 1);
+    }
 
     const selected = this.selectedZone();
-    for (const player of [HUMAN, RIVAL]) {
+    for (const player of PLAYERS) {
       const state = this.duel.players[player];
       this.infoTexts[player].setText(`${state.name} LP${state.lp} MÃO${state.hand.length} DK${state.deck.length}`);
 
       state.monsters.forEach((monster, zone) => {
         const x = zoneX(zone);
         const y = ROW_Y[player];
-        g.fillStyle(0x184030).fillRect(x - 14, y - 14, 28, 28);
-        if (selected?.player === player && selected.zone === zone) {
-          g.lineStyle(2, 0xf8d840).strokeRect(x - 15, y - 15, 30, 30);
-        }
+        const isSelected = selected?.player === player && selected.zone === zone;
+        g.fillStyle(isSelected ? 0xf8d840 : SIDE_COLOR[player]).fillRect(x - 15, y - 15, 30, 30);
+        g.fillStyle(0x0c1428).fillRect(
+          x - (isSelected ? 13 : 14),
+          y - (isSelected ? 13 : 14),
+          isSelected ? 26 : 28,
+          isSelected ? 26 : 28,
+        );
 
         const label = this.valueTexts[player][zone] as Phaser.GameObjects.Text;
+        const thumb = this.thumbs[player][zone] as Phaser.GameObjects.Image;
+        thumb.setVisible(false);
         if (!monster) {
           label.setText('');
           return;
@@ -427,12 +470,18 @@ export class DuelScene extends Phaser.Scene {
         drawCard(g, x, y, monster);
         if (monster.faceDown) {
           // O valor da própria carta baixada continua visível para o dono.
-          label.setText(player === HUMAN ? `${monster.card.def}` : '????').setColor('#a8c0b8');
-        } else if (monster.position === 'attack') {
-          label.setText(`${monster.card.atk}`).setColor('#f8f8f8');
-        } else {
-          label.setText(`${monster.card.def}`).setColor('#88c8f8');
+          label.setText(player === HUMAN ? `${monster.card.def}` : '????').setColor('#a8b8d8');
+          return;
         }
+        const upright = monster.position === 'attack';
+        setCardArt(thumb, monster.card);
+        thumb
+          .setDisplaySize(THUMB_SIZE, THUMB_SIZE)
+          .setPosition(upright ? x : x - 2, upright ? y - 1 : y)
+          .setAngle(upright ? 0 : -90)
+          .setVisible(true);
+        if (upright) label.setText(`${monster.card.atk}`).setColor('#f8f8f8');
+        else label.setText(`${monster.card.def}`).setColor('#88c8f8');
       });
     }
   }
@@ -442,7 +491,7 @@ function zoneX(zone: number): number {
   return ZONE_FIRST_X + zone * ZONE_SPACING;
 }
 
-/** Carta em pé = ataque; deitada = defesa; verso marrom = virada para baixo. */
+/** Moldura da carta no campo. Em pé = ataque; deitada = defesa; verso marrom = virada para baixo. */
 function drawCard(g: Phaser.GameObjects.Graphics, x: number, y: number, monster: FieldMonster): void {
   const upright = monster.position === 'attack';
   const width = upright ? 20 : 26;
@@ -450,21 +499,16 @@ function drawCard(g: Phaser.GameObjects.Graphics, x: number, y: number, monster:
   const left = x - width / 2;
   const top = y - height / 2;
 
-  g.fillStyle(0x281808).fillRect(left, top, width, height);
+  g.fillStyle(0x181008).fillRect(left, top, width, height);
   if (monster.faceDown) {
     g.fillStyle(0x985828).fillRect(left + 1, top + 1, width - 2, height - 2);
-    g.fillStyle(0x603010).fillRect(left + 4, top + 4, width - 8, height - 8);
-    g.fillStyle(0xd89040).fillRect(x - 3, y - 3, 6, 6);
+    g.fillStyle(0x3a1c08).fillRect(left + 4, top + 4, width - 8, height - 8);
+    g.fillStyle(0xe09040).fillRect(x - 3, y - 3, 6, 6);
     return;
   }
-  // Moldura amarela de Monstro Normal, com a "ilustração" na cor do atributo.
+  // Moldura amarela de Monstro Normal; a ilustração é uma imagem por cima (ver drawField).
   g.fillStyle(0xd8b050).fillRect(left + 1, top + 1, width - 2, height - 2);
-  g.fillStyle(ATTRIBUTE_COLOR[monster.card.attribute]);
-  if (upright) {
-    g.fillRect(left + 3, top + 4, width - 6, 12);
-    g.fillStyle(0xf0e0b0).fillRect(left + 3, top + 18, width - 6, 5);
-  } else {
-    g.fillRect(left + 4, top + 3, 12, height - 6);
-    g.fillStyle(0xf0e0b0).fillRect(left + 18, top + 3, 5, height - 6);
-  }
+  g.fillStyle(0xf8e8a8);
+  if (upright) g.fillRect(left + 2, top + 21, width - 4, 3);
+  else g.fillRect(left + 21, top + 2, 3, height - 4);
 }
