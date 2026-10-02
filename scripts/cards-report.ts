@@ -6,7 +6,8 @@
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { cardListSchema, isPlayable, type AnyCard } from '../src/duel/cardSchema.ts';
+import { type AnyCard, cardListSchema } from '../src/duel/cardSchema.ts';
+import { isPlayable } from '../src/duel/playable.ts';
 
 const CARDS_FILE = new URL('../data/cards/cards.json', import.meta.url);
 const REPORT_FILE = new URL('../docs/CARTAS.md', import.meta.url);
@@ -33,7 +34,8 @@ function details(card: AnyCard): string {
 
 function table(cards: AnyCard[]): string {
   const rows = cards.map(
-    (card) => `| ${isPlayable(card) ? '✅' : '—'} | ${card.name} | ${card.nameEn} | ${details(card)} | \`${card.id}\` |`,
+    (card) =>
+      `| ${isPlayable(card) ? '✅' : '—'} | ${card.name} | ${card.nameEn} | ${details(card)} | \`${card.id}\` |`,
   );
   return ['| Jogável | Nome | Nome em inglês | Detalhes | id |', '|:-:|---|---|---|---|', ...rows].join('\n');
 }
@@ -51,7 +53,7 @@ export async function writeCardReport(cards: AnyCard[]): Promise<void> {
     '> Arquivo gerado por `npm run cards:report`. Não edite à mão: as mudanças se perdem na próxima geração.',
     '',
     `O banco tem **${cards.length} cartas**; o motor de duelo já sabe jogar **${playable}**.`,
-    'Uma carta vira "jogável" quando o motor implementa o que ela precisa (ver `isPlayable` em `src/duel/cardSchema.ts`).',
+    'Uma carta vira "jogável" quando o motor implementa o que ela precisa (ver `isPlayable` em `src/duel/playable.ts`).',
     '',
     section('Monstros', 'monster'),
     '',
