@@ -33,6 +33,11 @@ export const ACADEMY_ISLAND: MapDef = {
     '~~~~~~~~~~~~~PP~~~~~~~~~~~~~~~',
   ],
   start: { x: 13, y: 18, facing: 'up' },
+  buildings: [
+    { sprite: 'academy', x: 9, baseY: 5 },
+    { sprite: 'sliferDorm', x: 4, baseY: 13 },
+    { sprite: 'obeliskDorm', x: 20, baseY: 13 },
+  ],
   npcs: [
     {
       id: 'syrus',
