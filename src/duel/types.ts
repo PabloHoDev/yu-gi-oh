@@ -1,23 +1,17 @@
-export type PlayerId = 0 | 1;
+import type { MonsterCard } from './cardSchema';
 
-export type Attribute = 'DARK' | 'EARTH' | 'FIRE' | 'LIGHT' | 'WATER' | 'WIND';
+export type { AnyCard, Attribute, MonsterCard, SpellCard, TrapCard } from './cardSchema';
+
+export type PlayerId = 0 | 1;
 
 export type Position = 'attack' | 'defense';
 
 export type Phase = 'main1' | 'battle' | 'main2';
 
-export interface MonsterCard {
-  id: string;
-  kind: 'monster';
-  name: string;
-  level: number;
-  atk: number;
-  def: number;
-  attribute: Attribute;
-  type: string;
-}
-
-/** Magias e armadilhas entram nesta união quando o sistema de efeitos existir. */
+/**
+ * Carta que pode estar em um deck durante o duelo. Hoje só monstros; vira
+ * AnyCard quando o motor ganhar magias e armadilhas.
+ */
 export type Card = MonsterCard;
 
 export interface FieldMonster {
