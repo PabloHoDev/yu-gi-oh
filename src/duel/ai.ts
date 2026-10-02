@@ -1,4 +1,4 @@
-import { tributesRequired, type Duel, type SummonMode } from './engine';
+import { type Duel, type SummonMode, tributesRequired } from './engine';
 import type { DuelEvent, FieldMonster, PlayerId } from './types';
 
 /** Ataque mínimo para a IA arriscar atacar uma carta baixada. */
