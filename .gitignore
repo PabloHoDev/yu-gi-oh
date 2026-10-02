@@ -5,3 +5,7 @@ dist/
 Thumbs.db
 .vite/
 coverage/
+
+# Ilustrações oficiais das cartas: baixadas por "npm run art:import", nunca versionadas.
+public/assets/generated/
+.cache/
