@@ -1,5 +1,5 @@
 import type { DeckId } from '../duel/cards';
-import { LEGEND, type Tile } from './tiles';
+import { LEGEND, Tile } from './tiles';
 
 export type Direction = 'down' | 'up' | 'left' | 'right';
 
@@ -42,6 +42,14 @@ export interface SignDef {
   text: string;
 }
 
+/** Prédio desenhado como uma imagem única por cima dos tiles sólidos que ele ocupa. */
+export interface BuildingDef {
+  sprite: 'academy' | 'sliferDorm' | 'obeliskDorm';
+  /** Coluna do tile mais à esquerda e linha do tile da base (a imagem cresce para cima). */
+  x: number;
+  baseY: number;
+}
+
 export interface MapDef {
   id: string;
   name: string;
@@ -50,6 +58,7 @@ export interface MapDef {
   start: { x: number; y: number; facing: Direction };
   npcs: readonly NpcDef[];
   signs: readonly SignDef[];
+  buildings: readonly BuildingDef[];
 }
 
 export function mapSize(map: MapDef): { width: number; height: number } {
@@ -57,10 +66,12 @@ export function mapSize(map: MapDef): { width: number; height: number } {
 }
 
 export function tileData(map: MapDef): Tile[][] {
-  return map.rows.map((row) =>
-    [...row].map((symbol) => {
+  return map.rows.map((row, y) =>
+    [...row].map((symbol, x) => {
       const info = LEGEND[symbol];
       if (!info) throw new Error(`Símbolo de mapa desconhecido: "${symbol}"`);
+      // Espalha tufos pela grama para o gramado não parecer uma grade repetida.
+      if (info.tile === Tile.Grass && (x * 7 + y * 13) % 5 === 0) return Tile.GrassTuft;
       return info.tile;
     }),
   );
