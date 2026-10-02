@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import type Phaser from 'phaser';
 import { BOX_CHARS, BOX_HEIGHT, BOX_LINES, BOX_PADDING, BOX_Y, GAME_WIDTH } from '../config';
 import { drawPanel, makeText } from './panel';
 import { paginate } from './text';
