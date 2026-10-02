@@ -30,13 +30,18 @@ Abra http://localhost:5173.
 
 ## Documentação
 
-- [Tecnologias, arquitetura e etapas](docs/TECNOLOGIAS.md)
+- [Tecnologias e arquitetura](docs/TECNOLOGIAS.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Como evoluir o jogo](docs/COMO-EVOLUIR.md): adicionar cartas, decks, NPCs, mapas e regras
+- [Cartas do jogo](docs/CARTAS.md): as 200 cartas e quais já são jogáveis
+- [Changelog](CHANGELOG.md)
 - [Referência de estilo visual](pokemon_firered_leafgreen_estilo_completo.md)
 
 ## Outros comandos
 
 ```bash
-npm test           # testes
-npm run typecheck  # tipos
-npm run build      # versão de produção em dist/
+npm run check         # lint + tipos + testes + build
+npm run format        # corrige formatação e lint
+npm test              # só os testes
+npm run cards:import  # baixa as cartas da seleção e regenera o banco
 ```
