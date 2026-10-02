@@ -18,6 +18,8 @@ Ele roda lint, tipos, testes e build. Se passar, a mudança não quebrou nada do
 2. Rode `npm run cards:import`. Ele baixa os dados, grava `data/cards/cards.json` e atualiza [CARTAS.md](CARTAS.md).
 3. Se o importador avisar que alguma carta ficou **sem tradução**, escreva o nome e o texto em português em [data/cards/translations.pt.json](../data/cards/translations.pt.json) e rode de novo.
 
+4. Rode `npm run art:import` para baixar a ilustração das cartas novas. Sem isso elas aparecem com um emblema na cor do atributo.
+
 Não edite `cards.json` à mão: a próxima importação sobrescreve.
 
 O `id` de cada carta é o nome em inglês em minúsculas com hifens (`elemental-hero-sparkman`). É ele que decks e saves usam; a lista completa está em [CARTAS.md](CARTAS.md).
@@ -49,9 +51,14 @@ Os testes acusam NPC em tile sólido, dois NPCs no mesmo lugar e deck inexistent
 
 1. Crie um arquivo em `src/world/` exportando um `MapDef` (copie `academyIsland.ts` como modelo).
 2. Inclua o mapa na lista `MAPS` de [src/world/maps.test.ts](../src/world/maps.test.ts) para ele ser validado.
-3. Novos tipos de tile entram em [src/world/tiles.ts](../src/world/tiles.ts) (símbolo e se é sólido) e ganham desenho em [src/gfx/placeholders.ts](../src/gfx/placeholders.ts).
+3. Novos tipos de tile entram em [src/world/tiles.ts](../src/world/tiles.ts) (símbolo e se é sólido) e ganham desenho em [src/gfx/tileset.ts](../src/gfx/tileset.ts).
+4. Prédios são imagens inteiras desenhadas em [src/gfx/buildings.ts](../src/gfx/buildings.ts) e posicionadas pela lista `buildings` do mapa; os símbolos de prédio nas linhas do mapa só marcam a área sólida.
 
 Quando os mapas migrarem para o Tiled (etapa 1), esta receita muda.
+
+## Adicionar um personagem
+
+A pixel art dos personagens fica em [src/gfx/characterArt.ts](../src/gfx/characterArt.ts): o desenho é o mesmo para todos e cada personagem é uma paleta (cabelo, jaqueta, calça...). Para um NPC novo, acrescente uma paleta em `CHARACTER_PALETTES` e o nome dela no tipo `sprite` de `NpcDef` ([src/world/maps.ts](../src/world/maps.ts)).
 
 ## Adicionar uma cena
 
@@ -65,7 +72,7 @@ Quando os mapas migrarem para o Tiled (etapa 1), esta receita muda.
 2. Implemente em [src/duel/engine.ts](../src/duel/engine.ts). Jogada ilegal lança `DuelError` com mensagem em português.
 3. Se a regra produz algo que o jogador precisa ver, crie um evento novo em `DuelEvent` ([src/duel/types.ts](../src/duel/types.ts)) e a frase dele em [src/duel/describe.ts](../src/duel/describe.ts). O compilador aponta todo lugar que precisa tratar o evento novo.
 4. Ensine a IA a usar a regra em [src/duel/ai.ts](../src/duel/ai.ts). O teste em que a IA joga duelos inteiros contra si mesma pega jogadas ilegais.
-5. Só então ligue a regra à tela em `src/scenes/DuelScene.ts`.
+5. Só então ligue a regra à tela em `src/scenes/DuelScene.ts`. Se o evento merece uma cena em destaque (como a invocação e a batalha), trate-o em `present` de [src/ui/DuelStage.ts](../src/ui/DuelStage.ts).
 
 `src/duel` e `src/world` não podem importar Phaser nem código de tela; há um teste que falha se isso acontecer.
 
