@@ -9,17 +9,18 @@
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import {
+  type AnyCard,
+  type Attribute,
   cardListSchema,
   MONSTER_FRAMES,
   SPELL_TYPES,
   TRAP_TYPES,
-  type AnyCard,
-  type Attribute,
 } from '../src/duel/cardSchema.ts';
 import { writeCardReport } from './cards-report.ts';
 
 const API = 'https://db.ygoprodeck.com/api/v7/cardinfo.php';
 const SELECTION_FILE = new URL('../data/cards/selection.json', import.meta.url);
+const TRANSLATIONS_FILE = new URL('../data/cards/translations.pt.json', import.meta.url);
 const OUTPUT_FILE = new URL('../data/cards/cards.json', import.meta.url);
 /** A API aceita até 20 requisições por segundo; ficamos bem abaixo disso. */
 const REQUEST_GAP_MS = 250;
@@ -29,6 +30,12 @@ interface Selection {
   sets: string[];
   cards: string[];
 }
+
+interface Translations {
+  cards: Record<string, { name: string; text: string }>;
+}
+
+type Translation = Pick<ApiCard, 'name' | 'desc'>;
 
 interface ApiCard {
   id: number;
@@ -61,7 +68,7 @@ function chunks<T>(items: T[], size: number): T[][] {
   return out;
 }
 
-export function slug(name: string): string {
+function slug(name: string): string {
   return name
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
@@ -75,7 +82,7 @@ function cleanText(text: string): string {
 }
 
 /** Converte uma carta da API para o formato do jogo, ou explica por que ela não é suportada. */
-function convert(english: ApiCard, portuguese: ApiCard | undefined): AnyCard | string {
+function convert(english: ApiCard, portuguese: Translation | undefined): AnyCard | string {
   const base = {
     id: slug(english.name),
     passcode: english.id,
@@ -148,12 +155,30 @@ async function main(): Promise<void> {
     }
   }
 
+  // Traduções do projeto cobrem o que a API não tem em português.
+  const overrides = (JSON.parse(await readFile(TRANSLATIONS_FILE, 'utf8')) as Translations).cards;
+  const unused = new Set(Object.keys(overrides));
+  const untranslated: string[] = [];
+
   const cards: AnyCard[] = [];
   for (const card of english) {
-    const converted = convert(card, portuguese.get(card.id));
+    const id = slug(card.name);
+    const override = overrides[id];
+    let translation: Translation | undefined = portuguese.get(card.id);
+    if (translation) {
+      if (override) console.warn(`A API já traduz "${card.name}": remova ${id} de translations.pt.json.`);
+    } else if (override) {
+      translation = { name: override.name, desc: override.text };
+    } else {
+      untranslated.push(card.name);
+    }
+    unused.delete(id);
+
+    const converted = convert(card, translation);
     if (typeof converted === 'string') console.warn(`Ignorada: ${card.name} (${converted})`);
     else cards.push(converted);
   }
+  for (const id of unused) console.warn(`translations.pt.json tem "${id}", que não está na seleção.`);
   cards.sort((a, b) => a.id.localeCompare(b.id));
 
   const ids = new Set(cards.map((card) => card.id));
@@ -161,8 +186,10 @@ async function main(): Promise<void> {
   const validated = cardListSchema.parse(cards);
 
   await writeFile(OUTPUT_FILE, `${JSON.stringify(validated, null, 2)}\n`);
-  const untranslated = validated.filter((card) => !portuguese.has(card.passcode)).length;
-  console.log(`\n${validated.length} cartas gravadas em data/cards/cards.json (${untranslated} sem tradução).`);
+  console.log(`\n${validated.length} cartas gravadas em data/cards/cards.json.`);
+  if (untranslated.length > 0) {
+    console.warn(`Sem tradução (ficaram em inglês; adicione em translations.pt.json): ${untranslated.join(', ')}`);
+  }
   await writeCardReport(validated);
 }
 
