@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { FONT_SIZE, GAME_WIDTH, TILE_SIZE } from '../config';
-import { CHARACTER_FRAME } from '../gfx/placeholders';
+import { characterFrame } from '../gfx/characters';
+import { TILESET_KEY } from '../gfx/tileset';
 import { Controls } from '../input/Controls';
 import { DialogBox } from '../ui/DialogBox';
 import { drawPanel, makeText } from '../ui/panel';
@@ -15,10 +16,12 @@ import {
   OPPOSITE,
   tileData,
 } from '../world/maps';
+import { Tile } from '../world/tiles';
 import type { DuelSceneData, DuelSceneResult } from './DuelScene';
 import { SceneKey } from './keys';
 
 const STEP_MS = 180;
+const WATER_FRAME_MS = 600;
 
 interface Npc {
   def: NpcDef;
@@ -37,6 +40,8 @@ export class OverworldScene extends Phaser.Scene {
   private tileY = 0;
   private facing: Direction = 'down';
   private moving = false;
+  /** Alterna a perna a cada passo. */
+  private stride: 1 | 2 = 1;
   /** Verdadeiro durante transições de cena: ignora o jogador. */
   private busy = false;
 
@@ -47,16 +52,27 @@ export class OverworldScene extends Phaser.Scene {
   create(): void {
     const { width, height } = mapSize(this.map);
     const tilemap = this.make.tilemap({ data: tileData(this.map), tileWidth: TILE_SIZE, tileHeight: TILE_SIZE });
-    const tileset = tilemap.addTilesetImage('tiles', 'tiles', TILE_SIZE, TILE_SIZE, 0, 0);
-    if (!tileset) throw new Error('Tileset "tiles" não foi gerado.');
-    tilemap.createLayer(0, tileset, 0, 0);
+    const tileset = tilemap.addTilesetImage(TILESET_KEY, TILESET_KEY, TILE_SIZE, TILE_SIZE, 0, 0);
+    if (!tileset) throw new Error('O tileset não foi gerado.');
+    const ground = tilemap.createLayer(0, tileset, 0, 0);
+    this.time.addEvent({
+      delay: WATER_FRAME_MS,
+      loop: true,
+      callback: () => ground?.swapByIndex(Tile.Water, Tile.WaterAlt),
+    });
+
+    // Prédios e personagens são mais altos que um tile: ficam apoiados na base do tile
+    // e a profundidade segue a linha, para quem está mais ao sul cobrir quem está ao norte.
+    for (const building of this.map.buildings) {
+      this.add
+        .image(building.x * TILE_SIZE, (building.baseY + 1) * TILE_SIZE, building.sprite)
+        .setOrigin(0, 1)
+        .setDepth(building.baseY);
+    }
 
     this.npcs = this.map.npcs.map((def) => {
-      const sprite = this.add
-        .sprite(def.x * TILE_SIZE, def.y * TILE_SIZE, def.sprite)
-        .setOrigin(0)
-        .setDepth(def.y);
-      setFacing(sprite, def.facing, false);
+      const sprite = this.addCharacter(def.sprite, def.x, def.y);
+      setPose(sprite, def.facing, 0);
       return { def, sprite, defeated: false };
     });
 
@@ -66,15 +82,13 @@ export class OverworldScene extends Phaser.Scene {
     this.facing = facing;
     this.moving = false;
     this.busy = false;
-    this.player = this.add
-      .sprite(x * TILE_SIZE, y * TILE_SIZE, 'player')
-      .setOrigin(0)
-      .setDepth(y);
-    setFacing(this.player, facing, false);
+    this.player = this.addCharacter('player', x, y);
+    setPose(this.player, facing, 0);
 
     const camera = this.cameras.main;
     camera.setBounds(0, 0, width * TILE_SIZE, height * TILE_SIZE);
-    camera.startFollow(this.player, true, 1, 1, -TILE_SIZE / 2, -TILE_SIZE / 2);
+    // O sprite é ancorado no canto inferior esquerdo; a câmera mira o centro do tile.
+    camera.startFollow(this.player, true, 1, 1, -TILE_SIZE / 2, TILE_SIZE / 2);
     camera.fadeIn(300);
 
     this.controls = new Controls(this);
@@ -106,29 +120,37 @@ export class OverworldScene extends Phaser.Scene {
     if (direction) this.tryMove(direction);
   }
 
+  private addCharacter(key: string, tileX: number, tileY: number): Phaser.GameObjects.Sprite {
+    return this.add
+      .sprite(tileX * TILE_SIZE, (tileY + 1) * TILE_SIZE, key)
+      .setOrigin(0, 1)
+      .setDepth(tileY);
+  }
+
   private tryMove(direction: Direction): void {
     this.facing = direction;
     const { dx, dy } = DIRECTION_DELTA[direction];
     const x = this.tileX + dx;
     const y = this.tileY + dy;
     if (this.isBlocked(x, y)) {
-      setFacing(this.player, direction, false);
+      setPose(this.player, direction, 0);
       return;
     }
 
     this.moving = true;
     this.tileX = x;
     this.tileY = y;
+    this.stride = this.stride === 1 ? 2 : 1;
     this.player.setDepth(Math.max(y, y - dy));
-    setFacing(this.player, direction, true);
+    setPose(this.player, direction, this.stride);
     this.tweens.add({
       targets: this.player,
       x: x * TILE_SIZE,
-      y: y * TILE_SIZE,
+      y: (y + 1) * TILE_SIZE,
       duration: STEP_MS,
       onComplete: () => {
         this.player.setDepth(y);
-        setFacing(this.player, direction, false);
+        setPose(this.player, direction, 0);
         this.moving = false;
       },
     });
@@ -145,7 +167,7 @@ export class OverworldScene extends Phaser.Scene {
 
     const npc = this.npcs.find((candidate) => candidate.def.x === x && candidate.def.y === y);
     if (npc) {
-      setFacing(npc.sprite, OPPOSITE[this.facing], false);
+      setPose(npc.sprite, OPPOSITE[this.facing], 0);
       const duel = npc.def.duel;
       if (!duel) this.dialog.show(npc.def.dialog);
       else if (npc.defeated) this.dialog.show(duel.winText);
@@ -165,7 +187,7 @@ export class OverworldScene extends Phaser.Scene {
     camera.flash(250);
     camera.once(Phaser.Cameras.Scene2D.Events.FLASH_COMPLETE, () => camera.fadeOut(350));
     camera.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-      const data: DuelSceneData = { npcId: npc.def.id, opponent: duel };
+      const data: DuelSceneData = { npcId: npc.def.id, opponent: duel, opponentSprite: npc.def.sprite };
       this.scene.sleep();
       this.scene.run(SceneKey.Duel, data);
     });
@@ -202,7 +224,7 @@ export class OverworldScene extends Phaser.Scene {
   }
 }
 
-function setFacing(sprite: Phaser.GameObjects.Sprite, direction: Direction, step: boolean): void {
-  sprite.setFrame(CHARACTER_FRAME[direction] + (step ? 1 : 0));
+function setPose(sprite: Phaser.GameObjects.Sprite, direction: Direction, pose: 0 | 1 | 2): void {
+  sprite.setFrame(characterFrame(direction, pose));
   sprite.setFlipX(direction === 'left');
 }
