@@ -5,8 +5,18 @@ import { Controls } from '../input/Controls';
 import { DialogBox } from '../ui/DialogBox';
 import { drawPanel, makeText } from '../ui/panel';
 import { ACADEMY_ISLAND } from '../world/academyIsland';
-import { DIRECTION_DELTA, isSolid, mapSize, OPPOSITE, tileData, type Direction, type MapDef, type NpcDef } from '../world/maps';
+import {
+  DIRECTION_DELTA,
+  type Direction,
+  isSolid,
+  type MapDef,
+  mapSize,
+  type NpcDef,
+  OPPOSITE,
+  tileData,
+} from '../world/maps';
 import type { DuelSceneData, DuelSceneResult } from './DuelScene';
+import { SceneKey } from './keys';
 
 const STEP_MS = 180;
 
@@ -31,7 +41,7 @@ export class OverworldScene extends Phaser.Scene {
   private busy = false;
 
   constructor() {
-    super('Overworld');
+    super(SceneKey.Overworld);
   }
 
   create(): void {
@@ -42,7 +52,10 @@ export class OverworldScene extends Phaser.Scene {
     tilemap.createLayer(0, tileset, 0, 0);
 
     this.npcs = this.map.npcs.map((def) => {
-      const sprite = this.add.sprite(def.x * TILE_SIZE, def.y * TILE_SIZE, def.sprite).setOrigin(0).setDepth(def.y);
+      const sprite = this.add
+        .sprite(def.x * TILE_SIZE, def.y * TILE_SIZE, def.sprite)
+        .setOrigin(0)
+        .setDepth(def.y);
       setFacing(sprite, def.facing, false);
       return { def, sprite, defeated: false };
     });
@@ -53,7 +66,10 @@ export class OverworldScene extends Phaser.Scene {
     this.facing = facing;
     this.moving = false;
     this.busy = false;
-    this.player = this.add.sprite(x * TILE_SIZE, y * TILE_SIZE, 'player').setOrigin(0).setDepth(y);
+    this.player = this.add
+      .sprite(x * TILE_SIZE, y * TILE_SIZE, 'player')
+      .setOrigin(0)
+      .setDepth(y);
     setFacing(this.player, facing, false);
 
     const camera = this.cameras.main;
@@ -66,7 +82,9 @@ export class OverworldScene extends Phaser.Scene {
     this.showLocationBanner(this.map.name);
 
     this.events.on(Phaser.Scenes.Events.WAKE, this.onWake, this);
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.events.off(Phaser.Scenes.Events.WAKE, this.onWake, this));
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () =>
+      this.events.off(Phaser.Scenes.Events.WAKE, this.onWake, this),
+    );
   }
 
   update(): void {
@@ -149,7 +167,7 @@ export class OverworldScene extends Phaser.Scene {
     camera.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
       const data: DuelSceneData = { npcId: npc.def.id, opponent: duel };
       this.scene.sleep();
-      this.scene.run('Duel', data);
+      this.scene.run(SceneKey.Duel, data);
     });
   }
 
@@ -177,7 +195,9 @@ export class OverworldScene extends Phaser.Scene {
       duration: 300,
       hold: 1800,
       yoyo: true,
-      onComplete: () => banner.forEach((object) => object.destroy()),
+      onComplete: () => {
+        for (const object of banner) object.destroy();
+      },
     });
   }
 }
