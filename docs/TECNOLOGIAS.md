@@ -18,6 +18,7 @@ Legenda da coluna **Status**: ✅ já instalado e em uso no repositório · 🔜
 | Runtime de ferramentas | Node.js 24 + npm | ✅ | Rodar Vite, testes e scripts |
 | Testes | Vitest 5 | ✅ | Testes do motor de duelo, dos mapas e dos textos |
 | Fonte | Press Start 2P (via `@fontsource`) | ✅ | Tipografia pixelada, embutida no build |
+| Conversão de imagens | sharp | ✅ | Transforma as ilustrações das cartas em sprites de 64 × 64 no estilo GBA |
 | Controle de versão | Git + GitHub | ✅ | Histórico e colaboração |
 | Mapas | Tiled | 🔜 | Editor de mapas em tiles; exporta JSON que o Phaser carrega |
 | Pixel art | Aseprite (ou LibreSprite / Piskel, gratuitos) | 🔜 | Tilesets, sprites, animações, retratos, cartas |
@@ -159,7 +160,7 @@ Alternativa a avaliar quando chegarmos lá: usar o **ocgcore**, o núcleo de reg
 - **Formato:** definido em [src/duel/cardSchema.ts](../src/duel/cardSchema.ts) e conferido pelos testes.
 - **O que já é jogável:** [CARTAS.md](CARTAS.md) lista todas as cartas e marca as que o motor sabe jogar. Hoje são 43, os Monstros Normais. As outras 157 (efeito, fusão, magias e armadilhas) já estão no banco, esperando o sistema de efeitos.
 - **Decks:** [data/decks.json](../data/decks.json), com 40 cartas cada.
-- **Imagens das cartas:** não são baixadas. As ilustrações oficiais são protegidas por direito autoral; o plano é desenhar versões próprias em pixel art.
+- **Ilustrações das cartas:** `npm run art:import` baixa a ilustração oficial de cada carta (YGOPRODeck), converte para 64 × 64 px com paleta reduzida, no estilo dos sprites de GBA, e junta tudo em um atlas em `public/assets/generated/`. Essa pasta **não é versionada** (está no `.gitignore`): cada pessoa gera o atlas na própria máquina. Sem ele o jogo funciona com um emblema na cor do atributo. Ver a seção 14 antes de publicar o jogo com essas imagens.
 
 ---
 
@@ -178,7 +179,8 @@ Locais previstos: pátio e píer, prédio principal (salas de aula, arena de due
 - **Aseprite** é o padrão para pixel art e animação e exporta spritesheets com JSON que o Phaser lê. É pago; **LibreSprite** e **Piskel** são alternativas gratuitas.
 - Padrões: tiles de 16 × 16, personagens de 16 × 16 ou 16 × 24 no mapa, 4 direções, 3 a 4 frames de caminhada, paleta limitada e contornos escuros, como descrito no documento de estilo.
 - No duelo: campo, cartas pequenas e retratos maiores dos duelistas e monstros.
-- **Toda a arte atual é provisória e gerada por código** ([src/gfx/placeholders.ts](../src/gfx/placeholders.ts)), para o jogo rodar sem nenhum arquivo de imagem.
+- **A arte do mapa é pixel art própria desenhada por código** em [src/gfx/](../src/gfx/): tiles, personagens de 16 × 24 com os uniformes dos três dormitórios, o prédio da Academia com as três cúpulas e os dormitórios. Assim o jogo roda sem arquivos de imagem; quando houver arte feita no Aseprite, ela substitui esses módulos.
+- **No duelo**, o palco ([src/ui/DuelStage.ts](../src/ui/DuelStage.ts)) mostra a ilustração grande do monstro quando ele é invocado e o confronto entre atacante e alvo na batalha, como os hologramas do anime.
 - A fonte Press Start 2P é larga (8 px por letra). Mais adiante vale desenhar uma **fonte bitmap própria**, mais estreita, como as dos jogos de GBA.
 
 ---
@@ -225,6 +227,7 @@ npm run build         # gera a versão de produção em dist/
 npm run preview       # serve a versão de produção localmente
 npm run cards:import  # baixa as cartas da seleção e regenera o banco
 npm run cards:report  # regenera docs/CARTAS.md
+npm run art:import    # baixa as ilustrações das cartas e gera o atlas local (não versionado)
 ```
 
 ---
@@ -243,7 +246,8 @@ npm run cards:report  # regenera docs/CARTAS.md
 Yu-Gi-Oh! e Yu-Gi-Oh! GX pertencem a seus detentores (Konami, Shueisha e o espólio de Kazuki Takahashi). Este é um projeto de fã. Para reduzir o risco:
 
 - **Sem fins comerciais**: nada de venda, anúncios ou doações atreladas ao jogo.
-- **Arte, música e sons próprios.** Não copiar sprites, ilustrações de cartas nem trilhas dos jogos e do anime oficiais.
+- **Arte do mapa, música e sons próprios.** Não copiar sprites nem trilhas dos jogos e do anime oficiais.
+- **Ilustrações das cartas: são as oficiais**, convertidas para pixel art e mantidas só na máquina de quem roda o jogo, fora do repositório. É o ponto de maior exposição do projeto: publicar o jogo (site, itch.io, app) com essas imagens é distribuir arte protegida. Antes de publicar, a decisão é entre assumir esse risco ou trocar por ilustrações próprias — o jogo já funciona sem o atlas.
 - Aviso claro, na tela de título e no repositório, de que não é um produto oficial.
 
 Mesmo com esses cuidados, um projeto de fã pode receber pedido de remoção do detentor dos direitos. Se um dia a ideia for vender o jogo, o caminho é trocar nomes, cartas e personagens por um universo original e manter o motor.
