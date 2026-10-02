@@ -2,13 +2,14 @@ import Phaser from 'phaser';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config';
 import { Controls } from '../input/Controls';
 import { makeText } from '../ui/panel';
+import { SceneKey } from './keys';
 
 export class TitleScene extends Phaser.Scene {
   private controls!: Controls;
   private starting = false;
 
   constructor() {
-    super('Title');
+    super(SceneKey.Title);
   }
 
   create(): void {
@@ -24,7 +25,7 @@ export class TitleScene extends Phaser.Scene {
     const center = GAME_WIDTH / 2;
     makeText(this, center, 50, 'DUEL ACADEMY', '#f8f8f8').setFontSize(16).setOrigin(0.5, 0);
     makeText(this, center, 74, 'Fan game de Yu-Gi-Oh! GX', '#f8d840').setOrigin(0.5, 0);
-    makeText(this, center, 148, 'v0.1 - protótipo', '#8090c0').setOrigin(0.5, 0);
+    makeText(this, center, 148, `v${__APP_VERSION__} - protótipo`, '#8090c0').setOrigin(0.5, 0);
 
     const prompt = makeText(this, center, 116, 'APERTE Z', '#f8f8f8').setOrigin(0.5, 0);
     this.time.addEvent({ delay: 450, loop: true, callback: () => prompt.setVisible(!prompt.visible) });
@@ -36,6 +37,6 @@ export class TitleScene extends Phaser.Scene {
     if (this.starting || !this.controls.justConfirm()) return;
     this.starting = true;
     this.cameras.main.fadeOut(300);
-    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.start('Overworld'));
+    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.start(SceneKey.Overworld));
   }
 }
