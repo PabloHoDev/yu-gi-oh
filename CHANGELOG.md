@@ -2,6 +2,16 @@
 
 Registro das entregas do projeto, da mais recente para a mais antiga.
 
+## 0.3.0 — 2026-10-02
+
+### Gráficos
+
+- Duelo: ao invocar, a ilustração do monstro aparece em destaque com nome, nível, ATK e DEF. Na batalha, atacante e alvo se enfrentam lado a lado, com avanço, impacto, carta baixada virando, destruição e dano; no ataque direto o alvo é o próprio duelista.
+- Ilustrações das 200 cartas convertidas para sprites de 64 × 64 no estilo GBA (`npm run art:import`). Ficam só na máquina local, fora do repositório; sem elas o jogo usa um emblema por atributo.
+- Campo de duelo redesenhado como arena, com as zonas na cor de cada duelista e miniaturas das ilustrações nas cartas.
+- Mapa: prédio da Academia com as três cúpulas, dormitórios Slifer e Obelisk, personagens de 16 × 24 com uniforme e caminhada animada, grama com variação, água animada.
+- Tela de título com a ilha da Academia.
+
 ## 0.2.0 — 2026-10-02
 
 ### Cartas
