@@ -1,14 +1,15 @@
 import Phaser from 'phaser';
 import { BOX_CHARS, BOX_HEIGHT, BOX_LINES, BOX_PADDING, BOX_Y, GAME_WIDTH } from '../config';
 import { pickTributes, runAiStep } from '../duel/ai';
-import { buildDeck, DECKS } from '../duel/cards';
+import { buildDeck } from '../duel/cards';
 import { describeEvents } from '../duel/describe';
-import { Duel, DuelError, MONSTER_ZONES, tributesRequired, type SummonMode } from '../duel/engine';
+import { Duel, DuelError, MONSTER_ZONES, type SummonMode, tributesRequired } from '../duel/engine';
 import type { Attribute, DuelEvent, FieldMonster, Phase, PlayerId } from '../duel/types';
 import { Controls } from '../input/Controls';
 import { drawPanel, makeText } from '../ui/panel';
 import { paginate, truncate } from '../ui/text';
 import type { Direction, NpcDuel } from '../world/maps';
+import { SceneKey } from './keys';
 
 export interface DuelSceneData {
   npcId: string;
@@ -31,6 +32,7 @@ const INFO_Y: Readonly<Record<PlayerId, number>> = { 0: 98, 1: 2 };
 
 const ATTRIBUTE_COLOR: Readonly<Record<Attribute, number>> = {
   DARK: 0x7048a8,
+  DIVINE: 0xd8a030,
   EARTH: 0x987848,
   FIRE: 0xe05030,
   LIGHT: 0xf8e870,
@@ -73,7 +75,7 @@ export class DuelScene extends Phaser.Scene {
   private valueTexts!: Record<PlayerId, Phaser.GameObjects.Text[]>;
 
   constructor() {
-    super('Duel');
+    super(SceneKey.Duel);
   }
 
   create(data: DuelSceneData): void {
@@ -81,8 +83,8 @@ export class DuelScene extends Phaser.Scene {
     this.names = ['VOCÊ', data.opponent.name];
     this.duel = new Duel(
       [
-        { name: this.names[0], deck: buildDeck(DECKS.starter) },
-        { name: this.names[1], deck: buildDeck(DECKS[data.opponent.deck]) },
+        { name: this.names[0], deck: buildDeck('starter') },
+        { name: this.names[1], deck: buildDeck(data.opponent.deck) },
       ],
       { startingLP: data.opponent.startingLP },
     );
@@ -183,18 +185,18 @@ export class DuelScene extends Phaser.Scene {
         return;
 
       case 'ATACAR': {
-        if (duel.turn === 1) return this.say(['Não se pode atacar no primeiro turno do duelo.'], back);
-        if (duel.phase === 'main2') return this.say(['A Fase de Batalha deste turno já acabou.'], back);
         const zones = duel.attackerZones();
-        if (zones.length === 0) return this.say(['Nenhum monstro seu pode atacar agora.'], back);
-        this.setState({ kind: 'pickAttacker', zones, index: 0 });
+        if (duel.turn === 1) this.say(['Não se pode atacar no primeiro turno do duelo.'], back);
+        else if (duel.phase === 'main2') this.say(['A Fase de Batalha deste turno já acabou.'], back);
+        else if (zones.length === 0) this.say(['Nenhum monstro seu pode atacar agora.'], back);
+        else this.setState({ kind: 'pickAttacker', zones, index: 0 });
         return;
       }
 
       case 'POSIÇÃO': {
         const zones = duel.repositionZones();
-        if (zones.length === 0) return this.say(['Nenhum monstro seu pode mudar de posição agora.'], back);
-        this.setState({ kind: 'pickPosition', zones, index: 0 });
+        if (zones.length === 0) this.say(['Nenhum monstro seu pode mudar de posição agora.'], back);
+        else this.setState({ kind: 'pickPosition', zones, index: 0 });
         return;
       }
 
@@ -279,7 +281,7 @@ export class DuelScene extends Phaser.Scene {
     camera.fadeOut(400);
     camera.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
       const result: DuelSceneResult = { npcId: this.npcId, won: this.duel.winner === HUMAN };
-      this.scene.wake('Overworld', result);
+      this.scene.wake(SceneKey.Overworld, result);
       this.scene.stop();
     });
   }
