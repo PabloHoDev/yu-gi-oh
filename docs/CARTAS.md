@@ -3,7 +3,7 @@
 > Arquivo gerado por `npm run cards:report`. Não edite à mão: as mudanças se perdem na próxima geração.
 
 O banco tem **200 cartas**; o motor de duelo já sabe jogar **43**.
-Uma carta vira "jogável" quando o motor implementa o que ela precisa (ver `isPlayable` em `src/duel/cardSchema.ts`).
+Uma carta vira "jogável" quando o motor implementa o que ela precisa (ver `isPlayable` em `src/duel/playable.ts`).
 
 ## Monstros (114)
 
@@ -71,10 +71,11 @@ Uma carta vira "jogável" quando o motor implementa o que ela precisa (ver `isPl
 | ✅ | Guerreiro de Zera | Warrior of Zera | Normal · EARTH · Warrior · N4 · 1600/1600 | `warrior-of-zera` |
 | — | Homem Bolha, o HERÓI do Elemento | Elemental HERO Bubbleman | Efeito · WATER · Warrior · N4 · 800/1200 | `elemental-hero-bubbleman` |
 | — | Homem-Alado das Chamas, o HERÓI do Elemento | Elemental HERO Flame Wingman | Fusão · WIND · Warrior · N6 · 2100/1200 | `elemental-hero-flame-wingman` |
-| — | Infernal Incinerator | Infernal Incinerator | Efeito · FIRE · Fiend · N6 · 2800/1800 | `infernal-incinerator` |
+| — | Incinerador Infernal | Infernal Incinerator | Efeito · FIRE · Fiend · N6 · 2800/1800 | `infernal-incinerator` |
 | ✅ | Jacaré Cyber-Tech | Cyber-Tech Alligator | Normal · WIND · Machine · N5 · 2500/1600 | `cyber-tech-alligator` |
 | ✅ | Jerry, Homem Feijão | Jerry Beans Man | Normal · EARTH · Plant · N3 · 1750/0 | `jerry-beans-man` |
 | — | Kuriboh | Kuriboh | Efeito · DARK · Fiend · N1 · 300/200 | `kuriboh` |
+| — | Kuriboh Alado | Winged Kuriboh | Efeito · LIGHT · Fairy · N1 · 300/200 | `winged-kuriboh` |
 | — | Kuriboh Alado LV 10 | Winged Kuriboh LV10 | Efeito · LIGHT · Fairy · N10 · 300/200 | `winged-kuriboh-lv10` |
 | ✅ | La Jinn, o Gênio Místico da Lâmpada | La Jinn the Mystical Genie of the Lamp | Normal · DARK · Fiend · N4 · 1800/1000 | `la-jinn-the-mystical-genie-of-the-lamp` |
 | ✅ | Lady Harpia | Harpie Lady | Normal · WIND · Winged Beast · N4 · 1300/1400 | `harpie-lady` |
@@ -87,6 +88,7 @@ Uma carta vira "jogável" quando o motor implementa o que ela precisa (ver `isPl
 | — | Máscara da Escuridão | Mask of Darkness | Efeito (Flip) · DARK · Fiend · N2 · 900/400 | `mask-of-darkness` |
 | — | Mataza, o Surpreendente | Mataza the Zapper | Efeito · DARK · Warrior · N3 · 1300/800 | `mataza-the-zapper` |
 | — | Mestre Ninja Sasuke | Ninja Grandmaster Sasuke | Efeito · LIGHT · Warrior · N4 · 1800/1000 | `ninja-grandmaster-sasuke` |
+| — | Múmia Venenosa | Poison Mummy | Efeito (Flip) · EARTH · Zombie · N4 · 1000/1800 | `poison-mummy` |
 | — | Necrosombra, o HERÓI do Elemento | Elemental HERO Necroshade | Efeito · DARK · Warrior · N5 · 1600/1800 | `elemental-hero-necroshade` |
 | ✅ | Neo, o Espadachim Mágico | Neo the Magic Swordsman | Normal · LIGHT · Spellcaster · N4 · 1700/1000 | `neo-the-magic-swordsman` |
 | ✅ | Neos, o HERÓI do Elemento | Elemental HERO Neos | Normal · LIGHT · Warrior · N7 · 2500/2000 | `elemental-hero-neos` |
@@ -98,7 +100,6 @@ Uma carta vira "jogável" quando o motor implementa o que ela precisa (ver `isPl
 | — | Patroide | Patroid | Efeito · EARTH · Machine · N4 · 1200/1200 | `patroid` |
 | — | Pequeno-Winguarda | Little-Winguard | Efeito · WIND · Warrior · N4 · 1400/1800 | `little-winguard` |
 | — | Perfuroide | Drillroid | Efeito · EARTH · Machine · N4 · 1600/1600 | `drillroid` |
-| — | Poison Mummy | Poison Mummy | Efeito (Flip) · EARTH · Zombie · N4 · 1000/1800 | `poison-mummy` |
 | — | Primeiro Dragão Cibernético | Proto-Cyber Dragon | Efeito · LIGHT · Machine · N3 · 1100/600 | `proto-cyber-dragon` |
 | — | Princesa de Tsurugi | Princess of Tsurugi | Efeito (Flip) · WIND · Warrior · N3 · 900/700 | `princess-of-tsurugi` |
 | — | Rei Ojama | Ojama King | Fusão · LIGHT · Beast · N6 · 0/3000 | `ojama-king` |
@@ -119,7 +120,6 @@ Uma carta vira "jogável" quando o motor implementa o que ela precisa (ver `isPl
 | — | VW-Catapulta Tigre | VW-Tiger Catapult | Fusão · LIGHT · Machine · N6 · 2000/2100 | `vw-tiger-catapult` |
 | — | VWXYZ-Dragão Catapulta Canhão | VWXYZ-Dragon Catapult Cannon | Fusão · LIGHT · Machine · N8 · 3000/2800 | `vwxyz-dragon-catapult-cannon` |
 | — | W-Catapulta de Asa | W-Wing Catapult | Efeito (Union) · LIGHT · Machine · N4 · 1300/1500 | `w-wing-catapult` |
-| — | Winged Kuriboh | Winged Kuriboh | Efeito · LIGHT · Fairy · N1 · 300/200 | `winged-kuriboh` |
 | — | Wroughtweiller | Wroughtweiler | Efeito · EARTH · Machine · N3 · 800/1200 | `wroughtweiler` |
 | — | XYZ - Dragão Canhão | XYZ-Dragon Cannon | Fusão · LIGHT · Machine · N8 · 2800/2600 | `xyz-dragon-cannon` |
 | ✅ | Zure, Cavaleiro do Mundo das Trevas | Zure, Knight of Dark World | Normal · DARK · Fiend · N4 · 1800/1500 | `zure-knight-of-dark-world` |
@@ -128,25 +128,23 @@ Uma carta vira "jogável" quando o motor implementa o que ela precisa (ver `isPl
 
 | Jogável | Nome | Nome em inglês | Detalhes | id |
 |:-:|---|---|---|---|
+| — | Aliança Chtoniana | Chthonian Alliance | Magia Equipamento | `chthonian-alliance` |
 | — | Anel da Defesa | Ring of Defense | Magia Rápida | `ring-of-defense` |
 | — | Arma Spark | Spark Blaster | Magia Equipamento | `spark-blaster` |
 | — | Arranha-Céu | Skyscraper | Magia Campo | `skyscraper` |
 | — | Asas Transcendentais | Transcendent Wings | Magia Rápida | `transcendent-wings` |
-| — | Bubble Blaster | Bubble Blaster | Magia Equipamento | `bubble-blaster` |
-| — | Burst Return | Burst Return | Magia Normal | `burst-return` |
 | — | Cápsula de uma Dimensão Diferente | Different Dimension Capsule | Magia Normal | `different-dimension-capsule` |
 | — | Castelo do Mecanismo Antigo | Ancient Gear Castle | Magia Contínua | `ancient-gear-castle` |
-| — | Chthonian Alliance | Chthonian Alliance | Magia Equipamento | `chthonian-alliance` |
 | — | Colar do Comando | Necklace of Command | Magia Equipamento | `necklace-of-command` |
 | — | Controlador de Inimigos | Enemy Controller | Magia Rápida | `enemy-controller` |
 | — | Controle Cerebral | Brain Control | Magia Normal | `brain-control` |
 | — | Desfusão | De-Fusion | Magia Rápida | `de-fusion` |
+| — | Disparo de Penas | Feather Shot | Magia Normal | `feather-shot` |
 | — | Embaralhar as Bolhas | Bubble Shuffle | Magia Rápida | `bubble-shuffle` |
 | — | Enterro Precoce | Premature Burial | Magia Equipamento | `premature-burial` |
 | — | Esmagando o Chão | Smashing Ground | Magia Normal | `smashing-ground` |
 | — | Estandarte da Coragem | Banner of Courage | Magia Contínua | `banner-of-courage` |
 | — | Fábrica Negra de Produção Maciça | Dark Factory of Mass Production | Magia Normal | `dark-factory-of-mass-production` |
-| — | Feather Shot | Feather Shot | Magia Normal | `feather-shot` |
 | — | Fissura | Fissure | Magia Normal | `fissure` |
 | — | Furacão Delta Ojama!! | Ojama Delta Hurricane!! | Magia Normal | `ojama-delta-hurricane` |
 | — | Fusão Futura | Future Fusion | Magia Contínua | `future-fusion` |
@@ -155,24 +153,25 @@ Uma carta vira "jogável" quando o motor implementa o que ela precisa (ver `isPl
 | — | Impulso Precipitado | Rush Recklessly | Magia Rápida | `rush-recklessly` |
 | — | Invocação Precipitada do Inferno | Inferno Reckless Summon | Magia Rápida | `inferno-reckless-summon` |
 | — | Lâmina Relâmpago | Lightning Blade | Magia Equipamento | `lightning-blade` |
-| — | Level Modulation | Level Modulation | Magia Normal | `level-modulation` |
+| — | Lançador de Bolhas | Bubble Blaster | Magia Equipamento | `bubble-blaster` |
 | — | Livro da Lua | Book of Moon | Magia Rápida | `book-of-moon` |
 | — | Machado de Ferro da Sorte | Lucky Iron Axe | Magia Equipamento | `lucky-iron-axe` |
 | — | Marreta Mágica
 }} | Magical Mallet | Magia Normal | `magical-mallet` |
+| — | Modulação de Nível | Level Modulation | Magia Normal | `level-modulation` |
+| — | Negação Implacável | Ruthless Denial | Magia Normal | `ruthless-denial` |
 | — | O Regresso do Guerreiro Vivo | The Warrior Returning Alive | Magia Normal | `the-warrior-returning-alive` |
 | — | Ojamagia | Ojamagic | Magia Normal | `ojamagic` |
 | — | Ojamúsculo | Ojamuscle | Magia Normal | `ojamuscle` |
 | — | Ookazi | Ookazi | Magia Normal | `ookazi` |
 | — | Pendente Negro | Black Pendant | Magia Equipamento | `black-pendant` |
-| — | Photon Generator Unit | Photon Generator Unit | Magia Rápida | `photon-generator-unit` |
 | — | Poder de Gaia | Gaia Power | Magia Campo | `gaia-power` |
 | — | Polimerização | Polymerization | Magia Normal | `polymerization` |
 | — | R - Justiça Honrada | R - Righteous Justice | Magia Normal | `r-righteous-justice` |
 | — | Reencarnação de Monstros | Monster Reincarnation | Magia Normal | `monster-reincarnation` |
 | — | Remédio Vermelho | Red Medicine | Magia Normal | `red-medicine` |
 | — | Remover Limites | Limiter Removal | Magia Rápida | `limiter-removal` |
-| — | Ruthless Denial | Ruthless Denial | Magia Normal | `ruthless-denial` |
+| — | Retorno da Burst | Burst Return | Magia Normal | `burst-return` |
 | — | Sábio da Fusão | Fusion Sage | Magia Normal | `fusion-sage` |
 | — | Tempestade Pesada | Heavy Storm | Magia Normal | `heavy-storm` |
 | — | Tornado Gigante | Giant Trunade | Magia Normal | `giant-trunade` |
@@ -183,6 +182,7 @@ Uma carta vira "jogável" quando o motor implementa o que ela precisa (ver `isPl
 | — | Tufão Espacial Místico | Mystical Space Typhoon | Magia Rápida | `mystical-space-typhoon` |
 | — | Turbilhão de Relâmpagos | Lightning Vortex | Magia Normal | `lightning-vortex` |
 | — | Uma Pena da Fénix | A Feather of the Phoenix | Magia Normal | `a-feather-of-the-phoenix` |
+| — | Unidade Geradora de Fótons | Photon Generator Unit | Magia Rápida | `photon-generator-unit` |
 | — | Vínculo de Poder | Power Bond | Magia Normal | `power-bond` |
 
 ## Armadilhas (31)
@@ -197,21 +197,20 @@ Uma carta vira "jogável" quando o motor implementa o que ela precisa (ver `isPl
 | — | Bomba do Cemitério | Cemetary Bomb | Armadilha Normal | `cemetary-bomb` |
 | — | Buraco Armadilha | Trap Hole | Armadilha Normal | `trap-hole` |
 | — | Chamado dos Assombrados | Call of the Haunted | Armadilha Contínua | `call-of-the-haunted` |
-| — | Chthonian Polymer | Chthonian Polymer | Armadilha Normal | `chthonian-polymer` |
 | — | Cilindro Mágico | Magic Cylinder | Armadilha Normal | `magic-cylinder` |
-| — | Clay Charge | Clay Charge | Armadilha Normal | `clay-charge` |
-| — | Damage Polarizer | Damage Polarizer | Armadilha Resposta | `damage-polarizer` |
 | — | Escudo Drenador | Draining Shield | Armadilha Normal | `draining-shield` |
 | — | Explosão Chtoniana | Chthonian Blast | Armadilha Normal | `chthonian-blast` |
-| — | Feather Wind | Feather Wind | Armadilha Resposta | `feather-wind` |
-| — | Fusion Guard | Fusion Guard | Armadilha Resposta | `fusion-guard` |
+| — | Guarda da Fusão | Fusion Guard | Armadilha Resposta | `fusion-guard` |
+| — | Investida de Argila | Clay Charge | Armadilha Normal | `clay-charge` |
 | — | Jarra da Ganância | Jar of Greed | Armadilha Normal | `jar-of-greed` |
 | — | Muralhas do Castelo | Castle Walls | Armadilha Normal | `castle-walls` |
 | — | Negativação de Ataque | Negate Attack | Armadilha Resposta | `negate-attack` |
 | — | O Túmulo da Ressurreição | The Grave of Enkindling | Armadilha Normal | `the-grave-of-enkindling` |
+| — | Polarizador de Dano | Damage Polarizer | Armadilha Resposta | `damage-polarizer` |
+| — | Polímero Chtoniano | Chthonian Polymer | Armadilha Normal | `chthonian-polymer` |
 | — | Pronto para Interceptar | Ready for Intercepting | Armadilha Normal | `ready-for-intercepting` |
 | — | Reforços | Reinforcements | Armadilha Normal | `reinforcements` |
-| — | Return Soul | Return Soul | Armadilha Normal | `return-soul` |
+| — | Retorno da Alma | Return Soul | Armadilha Normal | `return-soul` |
 | — | Rugido Ameaçador | Threatening Roar | Armadilha Normal | `threatening-roar` |
 | — | Sete Ferramentas do Bandido | Seven Tools of the Bandit | Armadilha Resposta | `seven-tools-of-the-bandit` |
 | — | Sinal do Herói | Hero Signal | Armadilha Normal | `hero-signal` |
@@ -220,3 +219,4 @@ Uma carta vira "jogável" quando o motor implementa o que ela precisa (ver `isPl
 | — | Trio Ojama | Ojama Trio | Armadilha Normal | `ojama-trio` |
 | — | Um Herói Aparece | A Hero Emerges | Armadilha Normal | `a-hero-emerges` |
 | — | Unidade Refletora de Ataques | Attack Reflector Unit | Armadilha Normal | `attack-reflector-unit` |
+| — | Vento de Penas | Feather Wind | Armadilha Resposta | `feather-wind` |
