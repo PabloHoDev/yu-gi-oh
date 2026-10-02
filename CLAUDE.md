@@ -13,6 +13,7 @@ npm run format        # corrige formatação e lint automaticamente (Biome)
 npm test              # só os testes
 npm run cards:import  # baixa as cartas de data/cards/selection.json e regenera cards.json e docs/CARTAS.md
 npm run cards:report  # só regenera docs/CARTAS.md
+npm run art:import    # baixa as ilustrações das cartas e gera o atlas local (não versionado)
 ```
 
 ## Regras de arquitetura
@@ -36,5 +37,7 @@ npm run cards:report  # só regenera docs/CARTAS.md
 
 ## Limites
 
-- Arte, música e ilustrações oficiais de Yu-Gi-Oh! não entram no repositório; a arte é própria (hoje provisória, gerada em `src/gfx/placeholders.ts`).
+- A arte do mapa, dos personagens e da interface é própria, desenhada por código em `src/gfx/` (`tileset.ts`, `characterArt.ts`, `buildings.ts`).
+- As ilustrações das cartas são oficiais: `npm run art:import` baixa e converte para `public/assets/generated/`, que está no `.gitignore`. **Nunca versionar essa pasta** nem outra arte, música ou sprite oficial de Yu-Gi-Oh!. Sem o atlas o jogo usa a arte provisória de `src/gfx/cardArt.ts`.
+- Toda narração de evento do duelo passa pelo palco (`src/ui/DuelStage.ts`): evento novo que o jogador precisa ver ganha uma cena lá.
 - Não fazer commit nem push sem o usuário pedir.
