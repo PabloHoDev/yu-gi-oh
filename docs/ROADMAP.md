@@ -11,6 +11,8 @@ Etapas do projeto, em ordem. Marque o item ao concluir e registre a entrega no [
 - [x] Decks de 40 cartas definidos em dados
 - [x] Lint, formatação, checagem única (`npm run check`) e CI
 - [x] Teste que protege a separação entre regras e tela
+- [x] Arte do mapa no clima do anime: Academia com as três cúpulas, dormitórios, uniformes
+- [x] Ilustração do monstro em destaque na invocação e cena de batalha entre os monstros
 
 ## Etapa 1 — Mundo
 
@@ -27,7 +29,8 @@ Etapas do projeto, em ordem. Marque o item ao concluir e registre a entrega no [
 - [ ] Escolha manual dos tributos
 - [ ] Cemitério visível; limite de 6 cartas na mão
 - [ ] Zonas de Magia e Armadilha (baixar cartas)
-- [ ] Animações de invocação, ataque e dano
+- [x] Animações de invocação, ataque e dano
+- [ ] Retratos dos duelistas na tela de duelo
 
 ## Etapa 3 — Efeitos
 
@@ -57,7 +60,7 @@ Cada grupo concluído amplia `isPlayable` e aumenta o número de cartas jogávei
 ## Etapa 6 — Arte e áudio finais
 
 - [ ] Tilesets e sprites em pixel art própria
-- [ ] Ilustrações próprias das cartas
+- [ ] Decidir as ilustrações das cartas para a versão publicada (hoje: oficiais, só locais)
 - [ ] Fonte bitmap própria, mais estreita
 - [ ] Trilha sonora e efeitos
 
