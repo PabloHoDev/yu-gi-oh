@@ -180,6 +180,7 @@ export class Duel {
         player: this.active,
         attacker: attacker.card,
         target: null,
+        targetPosition: null,
         targetWasFaceDown: false,
       });
       this.damage(this.opponent, atk, events);
@@ -196,6 +197,7 @@ export class Duel {
       player: this.active,
       attacker: attacker.card,
       target: target.card,
+      targetPosition: target.position,
       targetWasFaceDown,
     });
 
