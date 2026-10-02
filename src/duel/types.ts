@@ -44,7 +44,15 @@ export type DuelEvent =
   | { type: 'set'; player: PlayerId; zone: number; card: MonsterCard; tributes: MonsterCard[] }
   | { type: 'positionChange'; player: PlayerId; zone: number; card: MonsterCard; position: Position }
   | { type: 'flipSummon'; player: PlayerId; zone: number; card: MonsterCard }
-  | { type: 'attack'; player: PlayerId; attacker: MonsterCard; target: MonsterCard | null; targetWasFaceDown: boolean }
+  | {
+      type: 'attack';
+      player: PlayerId;
+      attacker: MonsterCard;
+      /** Nulo em ataque direto. */
+      target: MonsterCard | null;
+      targetPosition: Position | null;
+      targetWasFaceDown: boolean;
+    }
   | { type: 'destroy'; player: PlayerId; card: MonsterCard }
   | { type: 'damage'; player: PlayerId; amount: number }
   | { type: 'win'; player: PlayerId; reason: WinReason };
