@@ -23,10 +23,11 @@ Legenda da coluna **Status**: ✅ já instalado e em uso no repositório · 🔜
 | Pixel art | Aseprite (ou LibreSprite / Piskel, gratuitos) | 🔜 | Tilesets, sprites, animações, retratos, cartas |
 | Música | Furnace ou BeepBox | 🔜 | Trilha em estilo chiptune/GBA |
 | Efeitos sonoros | jsfxr + Audacity | 🔜 | Sons de menu, passos, ataques |
-| Dados de cartas | JSON local, importado da API do YGOPRODeck | 🔜 | Nomes, atributos, ATK/DEF e textos das cartas |
-| Save | `localStorage` com JSON versionado, validado com Zod | 🔜 | Progresso, coleção e decks |
-| Lint e formatação | ESLint + Prettier | 🔜 | Padrão de código |
-| Integração contínua | GitHub Actions | 🔜 | Rodar testes e build a cada push |
+| Dados de cartas | JSON local, importado da API do YGOPRODeck | ✅ | Nomes, atributos, ATK/DEF e textos de 200 cartas em português |
+| Validação de dados | Zod 4 | ✅ | Garante o formato do banco de cartas (e, depois, do save) |
+| Save | `localStorage` com JSON versionado | 🔜 | Progresso, coleção e decks |
+| Lint e formatação | Biome 2 | ✅ | Padrão de código e formatação automática |
+| Integração contínua | GitHub Actions | ✅ | Rodar `npm run check` a cada push (passa a valer quando o repositório subir para o GitHub) |
 | Publicação web | GitHub Pages ou itch.io | 🔜 | Jogar pelo navegador |
 | Instalável / offline | PWA (`vite-plugin-pwa`) | 🔜 | Jogar offline, ícone na tela inicial |
 | Desktop | Tauri | 🔜 | Executável para Windows, macOS e Linux |
@@ -97,6 +98,11 @@ A regra mais importante do projeto: **o motor de duelo não conhece o Phaser**.
 
 ```text
 docs/                 documentação do projeto
+data/
+  cards/              seleção, traduções e o banco de cartas gerado
+  decks.json          decks (id da carta → cópias)
+scripts/              importador de cartas e gerador de docs/CARTAS.md
+.github/workflows/    integração contínua
 src/
   main.ts             configuração do Phaser e escala inteira
   config.ts           resolução, tile, fonte, medidas da caixa de texto
@@ -107,7 +113,6 @@ src/
   input/              mapeamento dos botões
   gfx/                arte provisória gerada por código
 public/assets/        (futuro) tilesets, sprites, mapas, áudio
-data/cards/           (futuro) JSON de cartas importado
 ```
 
 ---
@@ -138,7 +143,7 @@ data/cards/           (futuro) JSON de cartas importado
 A era GX tem milhares de cartas, e cada efeito é uma regra nova. A estratégia:
 
 - **Efeitos como dados sempre que possível.** Efeitos comuns ("destrua 1 monstro", "compre 2 cartas", "+500 ATK") viram blocos reutilizáveis combinados no JSON da carta. Só os efeitos realmente únicos ganham código próprio.
-- **Começar pequeno.** Primeiro um conjunto fechado de cerca de 150–200 cartas que cobre os decks dos personagens principais; depois expandir por arquétipo.
+- **Começar pequeno.** Primeiro o conjunto fechado de 200 cartas que já está no banco e cobre os decks dos personagens principais; depois expandir por arquétipo.
 - **Uma carta só entra no jogo com teste automatizado do seu efeito.**
 
 Alternativa a avaliar quando chegarmos lá: usar o **ocgcore**, o núcleo de regras do EDOPro/YGOPro (C++ com scripts Lua para cada carta), compilado para WebAssembly. Ele já traz praticamente todas as cartas prontas. O custo é integrar um núcleo grande em C++ e aceitar a licença dele (copyleft, da família AGPL), que obrigaria a abrir o código do nosso jogo — precisa ser conferida antes de decidir.
@@ -148,11 +153,13 @@ Alternativa a avaliar quando chegarmos lá: usar o **ocgcore**, o núcleo de reg
 ## 6. Dados de cartas
 
 - **Fonte:** API pública do YGOPRODeck (`https://db.ygoprodeck.com/api/v7/cardinfo.php`), que tem nome, tipo, atributo, nível, ATK/DEF e texto, inclusive em português.
-- **Como usar:** um script Node (`scripts/import-cards`) baixa **uma vez** as cartas da era GX e grava JSON em `data/cards/`. O jogo nunca consulta a API enquanto roda.
-- **Formato:** um arquivo JSON por coleção, validado por esquema ao carregar.
-- **Imagens das cartas:** as ilustrações oficiais são protegidas por direito autoral. O plano é desenhar versões próprias em pixel art, pequenas, no estilo do jogo.
-
-Hoje o protótipo usa 20 Monstros Normais digitados à mão em [src/duel/cards.ts](../src/duel/cards.ts).
+- **Seleção:** [data/cards/selection.json](../data/cards/selection.json) lista coleções inteiras e cartas avulsas. As 200 primeiras vêm de seis produtos da era GX (Starter Deck 2006, Starter Decks do Jaden e do Syrus, Duelist Packs do Jaden, do Chazz e do Zane), mais cartas avulsas dos decks de Crowler e Alexis e Monstros Normais clássicos.
+- **Importação:** `npm run cards:import` baixa os dados e grava [data/cards/cards.json](../data/cards/cards.json). O jogo nunca consulta a API enquanto roda; ele lê só esse arquivo, que fica versionado.
+- **Tradução:** nomes e textos oficiais em português vêm da API. Para as 16 cartas que ela não tem em português, a tradução é do projeto e fica em [data/cards/translations.pt.json](../data/cards/translations.pt.json).
+- **Formato:** definido em [src/duel/cardSchema.ts](../src/duel/cardSchema.ts) e conferido pelos testes.
+- **O que já é jogável:** [CARTAS.md](CARTAS.md) lista todas as cartas e marca as que o motor sabe jogar. Hoje são 43, os Monstros Normais. As outras 157 (efeito, fusão, magias e armadilhas) já estão no banco, esperando o sistema de efeitos.
+- **Decks:** [data/decks.json](../data/decks.json), com 40 cartas cada.
+- **Imagens das cartas:** não são baixadas. As ilustrações oficiais são protegidas por direito autoral; o plano é desenhar versões próprias em pixel art.
 
 ---
 
@@ -189,7 +196,7 @@ Locais previstos: pátio e píer, prédio principal (salas de aula, arena de due
 
 - Primeira versão: `localStorage`, um JSON com número de versão para permitir migrações.
 - Conteúdo: posição no mapa, progresso da história, coleção de cartas, decks, dinheiro (DP), duelistas derrotados.
-- Validação com **Zod** ao carregar, para um save corrompido não quebrar o jogo.
+- Validação com **Zod** ao carregar (o mesmo usado no banco de cartas), para um save corrompido não quebrar o jogo.
 - Exportar e importar o save como arquivo. Save na nuvem só se um dia houver contas de usuário.
 
 ---
@@ -197,37 +204,37 @@ Locais previstos: pátio e píer, prédio principal (salas de aula, arena de due
 ## 11. Qualidade
 
 - **TypeScript `strict`** com `noUncheckedIndexedAccess`: erros de índice e de tipo aparecem na compilação.
-- **Vitest** para o motor de duelo (cada regra tem teste), para os mapas (retangulares, NPCs em tiles livres, decks válidos) e para a quebra de texto.
+- **Vitest** para o motor de duelo (cada regra tem teste), os mapas (retangulares, NPCs em tiles livres), o banco de cartas (formato, ids únicos) e os decks (40 a 60 cartas, até 3 cópias, só cartas jogáveis).
 - A IA joga 25 duelos completos contra si mesma nos testes, o que pega jogadas ilegais e travamentos.
-- 🔜 ESLint + Prettier, GitHub Actions rodando `npm test` e `npm run build`, e testes de navegador com Playwright.
+- Um teste de arquitetura falha se `src/duel` ou `src/world` importarem Phaser ou código de tela.
+- **Biome** faz lint e formatação. Foi escolhido no lugar de ESLint + Prettier porque o `typescript-eslint` ainda não suporta o TypeScript 7.
+- **`npm run check`** roda tudo (lint, tipos, testes, build) e é o mesmo comando do **GitHub Actions**.
+- 🔜 Testes de navegador com Playwright.
 
 ---
 
 ## 12. Comandos
 
 ```bash
-npm install        # instala as dependências
-npm run dev        # abre o jogo em http://localhost:5173 com recarregamento automático
-npm test           # roda os testes
-npm run typecheck  # confere os tipos
-npm run build      # gera a versão de produção em dist/
-npm run preview    # serve a versão de produção localmente
+npm install           # instala as dependências
+npm run dev           # abre o jogo em http://localhost:5173 com recarregamento automático
+npm run check         # lint + tipos + testes + build (rode antes de concluir qualquer mudança)
+npm run format        # corrige formatação e lint automaticamente
+npm test              # só os testes
+npm run build         # gera a versão de produção em dist/
+npm run preview       # serve a versão de produção localmente
+npm run cards:import  # baixa as cartas da seleção e regenera o banco
+npm run cards:report  # regenera docs/CARTAS.md
 ```
 
 ---
 
-## 13. Etapas
+## 13. Etapas e guias
 
-| Etapa | Entrega | Situação |
-|---|---|---|
-| 0. Fundação | Projeto configurado, mapa andável, diálogo, duelo básico contra IA, testes | ✅ feita |
-| 1. Mundo | Tiled, interiores e portas, NPCs que andam, menu de pausa, save | próxima |
-| 2. Duelo completo sem efeitos | Mão visível, zonas de Magia/Armadilha, cemitério, todas as fases, animações | |
-| 3. Efeitos | Sistema de efeitos, magias, armadilhas, Fusão | |
-| 4. Coleção | Importação de cartas, boosters, loja, editor de deck, DP | |
-| 5. Academia | História, aulas e provas, promoção de dormitório, rivais, torneios | |
-| 6. Arte e áudio finais | Substituir tudo o que é provisório | |
-| 7. Publicação | PWA, itch.io, desktop e celular | |
+- [ROADMAP.md](ROADMAP.md): as etapas do projeto e o que falta em cada uma.
+- [COMO-EVOLUIR.md](COMO-EVOLUIR.md): passo a passo para adicionar cartas, decks, NPCs, mapas, cenas e regras.
+- [CARTAS.md](CARTAS.md): todas as cartas do banco e quais já são jogáveis.
+- [CHANGELOG.md](../CHANGELOG.md): o que foi entregue em cada versão.
 
 ---
 
