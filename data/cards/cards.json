@@ -322,9 +322,9 @@
   {
     "id": "bubble-blaster",
     "passcode": 53586134,
-    "name": "Bubble Blaster",
+    "name": "Lançador de Bolhas",
     "nameEn": "Bubble Blaster",
-    "text": "You can only equip this card to \"Elemental Hero Bubbleman\". Increase the ATK of the equipped monster by 800 points. If the equipped monster would be destroyed as a result of battle, destroy this card instead, and make the Battle Damage to the controller of the equipped monster 0.",
+    "text": "Você só pode equipar este card em \"Homem Bolha, o HERÓI do Elemento\". O monstro equipado ganha 800 de ATK. Se o monstro equipado seria destruído em batalha, destrua este card em vez disso, e o dano de batalha ao controlador do monstro equipado se torna 0.",
     "archetype": "Elemental HERO",
     "kind": "spell",
     "spellType": "equip"
@@ -352,9 +352,9 @@
   {
     "id": "burst-return",
     "passcode": 27191436,
-    "name": "Burst Return",
+    "name": "Retorno da Burst",
     "nameEn": "Burst Return",
-    "text": "If you control a face-up \"Elemental HERO Burstinatrix\": Return all face-up \"Elemental HERO\" monsters on the field to the hand, except \"Elemental HERO Burstinatrix\".",
+    "text": "Se você controla \"Burstinatrix, o HERÓI do Elemento\" com a face para cima: devolva para a mão todos os monstros \"HERÓI do Elemento\" com a face para cima no campo, exceto \"Burstinatrix, o HERÓI do Elemento\".",
     "archetype": "Elemental HERO",
     "kind": "spell",
     "spellType": "normal"
@@ -438,9 +438,9 @@
   {
     "id": "chthonian-alliance",
     "passcode": 46910446,
-    "name": "Chthonian Alliance",
+    "name": "Aliança Chtoniana",
     "nameEn": "Chthonian Alliance",
-    "text": "The equipped monster gains 800 ATK for each other face-up monster on the field that has the same name it does.",
+    "text": "O monstro equipado ganha 800 de ATK para cada outro monstro com a face para cima no campo que tenha o mesmo nome que ele.",
     "kind": "spell",
     "spellType": "equip"
   },
@@ -456,18 +456,18 @@
   {
     "id": "chthonian-polymer",
     "passcode": 72287557,
-    "name": "Chthonian Polymer",
+    "name": "Polímero Chtoniano",
     "nameEn": "Chthonian Polymer",
-    "text": "Activate only when your opponent Fusion Summons a Fusion Monster. Tribute 1 monster to take control of that Fusion Monster.",
+    "text": "Ative somente quando seu oponente Invocar um Monstro de Fusão por Invocação-Fusão. Ofereça 1 monstro como Tributo para tomar o controle desse Monstro de Fusão.",
     "kind": "trap",
     "trapType": "normal"
   },
   {
     "id": "clay-charge",
     "passcode": 22479888,
-    "name": "Clay Charge",
+    "name": "Investida de Argila",
     "nameEn": "Clay Charge",
-    "text": "When an \"Elemental HERO Clayman\" you control is targeted for an attack (even if it is face-down, but reveal it to your opponent in that case): Destroy the attacking monster and that \"Elemental HERO Clayman\", and inflict 800 damage to your opponent.",
+    "text": "Quando um \"Clayman, o HERÓI do Elemento\" que você controla for escolhido como alvo de um ataque (mesmo que esteja com a face para baixo, mas, nesse caso, revele-o ao seu oponente): destrua o monstro atacante e esse \"Clayman, o HERÓI do Elemento\" e cause 800 de dano ao seu oponente.",
     "archetype": "Elemental HERO",
     "kind": "trap",
     "trapType": "normal"
@@ -741,9 +741,9 @@
   {
     "id": "damage-polarizer",
     "passcode": 46031686,
-    "name": "Damage Polarizer",
+    "name": "Polarizador de Dano",
     "nameEn": "Damage Polarizer",
-    "text": "Activate only when an effect that inflicts damage is activated. Negate its activation and effect, and each player draws 1 card.",
+    "text": "Ative somente quando um efeito que causa dano for ativado. Negue a ativação e o efeito, e cada duelista compra 1 card.",
     "kind": "trap",
     "trapType": "counter"
   },
@@ -1147,9 +1147,9 @@
   {
     "id": "feather-shot",
     "passcode": 19394153,
-    "name": "Feather Shot",
+    "name": "Disparo de Penas",
     "nameEn": "Feather Shot",
-    "text": "Target 1 face-up \"Elemental HERO Avian\" you control; during this turn, that target can attack a number of times equal to the number of monsters you control when this card resolves, but cannot attack directly, and other monsters you control cannot attack this turn.",
+    "text": "Escolha 1 \"Aviário, o HERÓI do Elemento\" com a face para cima que você controla; durante este turno, o alvo pode atacar um número de vezes igual ao número de monstros que você controla quando este card resolver, mas não pode atacar diretamente, e os outros monstros que você controla não podem atacar neste turno.",
     "archetype": "Elemental HERO",
     "kind": "spell",
     "spellType": "normal"
@@ -1157,9 +1157,9 @@
   {
     "id": "feather-wind",
     "passcode": 71060915,
-    "name": "Feather Wind",
+    "name": "Vento de Penas",
     "nameEn": "Feather Wind",
-    "text": "When a Spell/Trap Card is activated while you control a face-up \"Elemental HERO Avian\": Negate the activation and destroy it.",
+    "text": "Quando um Card de Magia/Armadilha for ativado enquanto você controla \"Aviário, o HERÓI do Elemento\" com a face para cima: negue a ativação e destrua-o.",
     "archetype": "Elemental HERO",
     "kind": "trap",
     "trapType": "counter"
@@ -1176,9 +1176,9 @@
   {
     "id": "fusion-guard",
     "passcode": 73026394,
-    "name": "Fusion Guard",
+    "name": "Guarda da Fusão",
     "nameEn": "Fusion Guard",
-    "text": "Activate only when an effect that inflicts damage is activated. Negate its activation and effect, and randomly send 1 Fusion Monster from your Extra Deck to the Graveyard.",
+    "text": "Ative somente quando um efeito que causa dano for ativado. Negue a ativação e o efeito, e envie aleatoriamente 1 Monstro de Fusão do seu Deck Adicional para o Cemitério.",
     "kind": "trap",
     "trapType": "counter"
   },
@@ -1333,9 +1333,9 @@
   {
     "id": "infernal-incinerator",
     "passcode": 23309606,
-    "name": "Infernal Incinerator",
+    "name": "Incinerador Infernal",
     "nameEn": "Infernal Incinerator",
-    "text": "This card can only be Normal Summoned or Set by discarding all other card(s) in your hand and Tributing 1 card you control with 2000 or more ATK. This card gains 200 ATK for each monster your opponent controls. This card loses 500 ATK for each other monster you control.",
+    "text": "Este card só pode ser Invocado por Invocação-Normal ou Baixado descartando todos os outros cards da sua mão e oferecendo como Tributo 1 card que você controla com 2000 ou mais de ATK. Este card ganha 200 de ATK para cada monstro que seu oponente controla. Este card perde 500 de ATK para cada outro monstro que você controla.",
     "kind": "monster",
     "frame": "effect",
     "level": 6,
@@ -1428,9 +1428,9 @@
   {
     "id": "level-modulation",
     "passcode": 61850482,
-    "name": "Level Modulation",
+    "name": "Modulação de Nível",
     "nameEn": "Level Modulation",
-    "text": "Your opponent draws 2 cards. Special Summon 1 \"LV\" monster from your Graveyard, ignoring the Summoning conditions. The monster that was Special Summoned by this effect cannot attack, nor activate or apply its effect this turn.",
+    "text": "Seu oponente compra 2 cards. Invoque por Invocação-Especial 1 monstro \"LV\" do seu Cemitério, ignorando as condições de Invocação. O monstro Invocado por este efeito não pode atacar, nem ativar ou aplicar seu efeito neste turno.",
     "kind": "spell",
     "spellType": "normal"
   },
@@ -1860,9 +1860,9 @@
   {
     "id": "photon-generator-unit",
     "passcode": 66607691,
-    "name": "Photon Generator Unit",
+    "name": "Unidade Geradora de Fótons",
     "nameEn": "Photon Generator Unit",
-    "text": "Tribute 2 \"Cyber Dragons\". Special Summon 1 \"Cyber Laser Dragon\" from your hand, Deck, or Graveyard.",
+    "text": "Ofereça 2 \"Dragão Cibernético\" como Tributo. Invoque por Invocação-Especial 1 \"Cyber Dragão Laser\" da sua mão, Deck ou Cemitério.",
     "archetype": "Cyber Dragon",
     "kind": "spell",
     "spellType": "quick-play"
@@ -1870,9 +1870,9 @@
   {
     "id": "poison-mummy",
     "passcode": 43716289,
-    "name": "Poison Mummy",
+    "name": "Múmia Venenosa",
     "nameEn": "Poison Mummy",
-    "text": "FLIP: Inflict 500 damage to your opponent.",
+    "text": "VIRE: cause 500 de dano ao seu oponente.",
     "kind": "monster",
     "frame": "effect",
     "level": 4,
@@ -2016,9 +2016,9 @@
   {
     "id": "return-soul",
     "passcode": 10537981,
-    "name": "Return Soul",
+    "name": "Retorno da Alma",
     "nameEn": "Return Soul",
-    "text": "Activate only during the End Phase. You can return up to 3 monsters destroyed this turn from the Graveyard to their owners' Decks.",
+    "text": "Ative somente durante a Fase Final. Você pode devolver até 3 monstros destruídos neste turno do Cemitério para os Decks de seus donos.",
     "kind": "trap",
     "trapType": "normal"
   },
@@ -2067,9 +2067,9 @@
   {
     "id": "ruthless-denial",
     "passcode": 73148972,
-    "name": "Ruthless Denial",
+    "name": "Negação Implacável",
     "nameEn": "Ruthless Denial",
-    "text": "Select 1 monster you control and send it to the Graveyard, and send 1 random card in your opponent's hand to the Graveyard.",
+    "text": "Selecione 1 monstro que você controla e envie-o para o Cemitério, e envie 1 card aleatório da mão do seu oponente para o Cemitério.",
     "kind": "spell",
     "spellType": "normal"
   },
@@ -2467,9 +2467,9 @@
   {
     "id": "winged-kuriboh",
     "passcode": 57116034,
-    "name": "Winged Kuriboh",
+    "name": "Kuriboh Alado",
     "nameEn": "Winged Kuriboh",
-    "text": "If this card on the field is destroyed and sent to the Graveyard: For the rest of this turn, you take no battle damage.",
+    "text": "Se este card no campo for destruído e enviado para o Cemitério: pelo resto deste turno, você não sofre dano de batalha.",
     "archetype": "Kuriboh",
     "kind": "monster",
     "frame": "effect",
