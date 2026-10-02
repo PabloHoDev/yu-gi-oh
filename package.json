@@ -1,7 +1,7 @@
 {
   "name": "duel-academy",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Fan game de Yu-Gi-Oh! GX no estilo dos RPGs de Game Boy Advance",
   "type": "module",
   "scripts": {
@@ -10,7 +10,12 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "lint": "biome check",
+    "format": "biome check --write",
+    "check": "biome check && tsc --noEmit && vitest run && vite build",
+    "cards:import": "node scripts/import-cards.ts",
+    "cards:report": "node scripts/cards-report.ts"
   },
   "dependencies": {
     "@fontsource/press-start-2p": "^5.3.0",
@@ -23,5 +28,8 @@
     "typescript": "^7.0.2",
     "vite": "^8.3.2",
     "vitest": "^5.0.3"
+  },
+  "engines": {
+    "node": ">=22.18"
   }
 }
