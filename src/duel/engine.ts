@@ -1,4 +1,4 @@
-import { shuffle, type Rng } from './rng';
+import { type Rng, shuffle } from './rng';
 import type { Card, DuelEvent, FieldMonster, MonsterCard, Phase, PlayerId, PlayerState } from './types';
 
 export const MONSTER_ZONES = 5;
@@ -175,7 +175,13 @@ export class Duel {
         throw new DuelError('Não se ataca diretamente enquanto o oponente tem monstros.');
       }
       attacker.hasAttacked = true;
-      events.push({ type: 'attack', player: this.active, attacker: attacker.card, target: null, targetWasFaceDown: false });
+      events.push({
+        type: 'attack',
+        player: this.active,
+        attacker: attacker.card,
+        target: null,
+        targetWasFaceDown: false,
+      });
       this.damage(this.opponent, atk, events);
       return events;
     }
@@ -185,7 +191,13 @@ export class Duel {
     attacker.hasAttacked = true;
     const targetWasFaceDown = target.faceDown;
     target.faceDown = false;
-    events.push({ type: 'attack', player: this.active, attacker: attacker.card, target: target.card, targetWasFaceDown });
+    events.push({
+      type: 'attack',
+      player: this.active,
+      attacker: attacker.card,
+      target: target.card,
+      targetWasFaceDown,
+    });
 
     if (target.position === 'attack') {
       const diff = atk - target.card.atk;
@@ -219,10 +231,7 @@ export class Duel {
 
   /** Zonas do jogador da vez com monstros que ainda podem mudar de posição. */
   repositionZones(): number[] {
-    return this.zonesWhere(
-      this.active,
-      (m) => m.summonedOnTurn !== this.turn && !m.positionChanged && !m.hasAttacked,
-    );
+    return this.zonesWhere(this.active, (m) => m.summonedOnTurn !== this.turn && !m.positionChanged && !m.hasAttacked);
   }
 
   zonesWhere(player: PlayerId, predicate: (monster: FieldMonster) => boolean): number[] {
