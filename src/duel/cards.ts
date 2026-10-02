@@ -1,91 +1,41 @@
-import type { Attribute, Card, MonsterCard } from './types';
-
-function normal(
-  id: string,
-  name: string,
-  attribute: Attribute,
-  type: string,
-  level: number,
-  atk: number,
-  def: number,
-): MonsterCard {
-  return { id, kind: 'monster', name, attribute, type, level, atk, def };
-}
+import cardsJson from '../../data/cards/cards.json';
+import decksJson from '../../data/decks.json';
+import type { AnyCard } from './cardSchema';
+import { isPlayable } from './playable';
+import type { Card } from './types';
 
 /**
- * Banco de cartas do protótipo: só Monstros Normais, digitados à mão.
- * Vai ser substituído por JSON gerado em data/cards (ver docs/TECNOLOGIAS.md).
+ * Banco de cartas do jogo, gerado por `npm run cards:import` (ver scripts/import-cards.ts).
+ * O formato é validado contra cardSchema nos testes, por isso a conversão de tipo aqui é segura.
  */
-const CARD_LIST: MonsterCard[] = [
-  normal('ehero-avian', 'Elemental HERO Avian', 'WIND', 'Warrior', 3, 1000, 1000),
-  normal('ehero-burstinatrix', 'Elemental HERO Burstinatrix', 'FIRE', 'Warrior', 3, 1200, 800),
-  normal('ehero-clayman', 'Elemental HERO Clayman', 'EARTH', 'Warrior', 4, 800, 2000),
-  normal('ehero-sparkman', 'Elemental HERO Sparkman', 'LIGHT', 'Warrior', 4, 1600, 1400),
-  normal('ehero-neos', 'Elemental HERO Neos', 'LIGHT', 'Warrior', 7, 2500, 2000),
-  normal('warrior-dai-grepher', 'Warrior Dai Grepher', 'EARTH', 'Warrior', 4, 1700, 1600),
-  normal('celtic-guardian', 'Celtic Guardian', 'EARTH', 'Warrior', 4, 1400, 1200),
-  normal('dark-blade', 'Dark Blade', 'DARK', 'Warrior', 4, 1800, 1500),
-  normal('giant-soldier-of-stone', 'Giant Soldier of Stone', 'EARTH', 'Rock', 3, 1300, 2000),
-  normal('mystical-elf', 'Mystical Elf', 'LIGHT', 'Spellcaster', 4, 800, 2000),
-  normal('summoned-skull', 'Summoned Skull', 'DARK', 'Fiend', 6, 2500, 1200),
-  normal('luster-dragon', 'Luster Dragon', 'WIND', 'Dragon', 4, 1900, 1600),
-  normal('gemini-elf', 'Gemini Elf', 'EARTH', 'Spellcaster', 4, 1900, 900),
-  normal('vorse-raider', 'Vorse Raider', 'DARK', 'Beast-Warrior', 4, 1900, 1200),
-  normal('battle-ox', 'Battle Ox', 'EARTH', 'Beast-Warrior', 4, 1700, 1000),
-  normal('la-jinn', 'La Jinn the Mystical Genie of the Lamp', 'DARK', 'Fiend', 4, 1800, 1000),
-  normal('x-head-cannon', 'X-Head Cannon', 'LIGHT', 'Machine', 4, 1800, 1500),
-  normal('archfiend-soldier', 'Archfiend Soldier', 'DARK', 'Fiend', 4, 1900, 1500),
-  normal('cyber-tech-alligator', 'Cyber-Tech Alligator', 'WIND', 'Machine', 5, 2500, 1600),
-  normal('blue-eyes-white-dragon', 'Blue-Eyes White Dragon', 'LIGHT', 'Dragon', 8, 3000, 2500),
-];
+export const ALL_CARDS = cardsJson as readonly AnyCard[];
 
-export const CARDS: ReadonlyMap<string, Card> = new Map(CARD_LIST.map((card) => [card.id, card]));
+export const CARDS: ReadonlyMap<string, AnyCard> = new Map(ALL_CARDS.map((card) => [card.id, card]));
 
-export function getCard(id: string): Card {
+export function getCard(id: string): AnyCard {
   const card = CARDS.get(id);
   if (!card) throw new Error(`Carta desconhecida: ${id}`);
   return card;
 }
 
-/** Lista de deck como pares [id, cópias]. */
-export type DeckList = readonly (readonly [string, number])[];
-
-export function buildDeck(list: DeckList): Card[] {
-  return list.flatMap(([id, copies]) => Array.from({ length: copies }, () => getCard(id)));
+export interface DeckDef {
+  name: string;
+  /** id da carta → número de cópias. */
+  cards: Readonly<Record<string, number>>;
 }
 
-// Decks de 20 cartas para duelos curtos no protótipo; o jogo final usa 40 a 60.
-export const STARTER_DECK: DeckList = [
-  ['ehero-avian', 2],
-  ['ehero-burstinatrix', 2],
-  ['ehero-clayman', 2],
-  ['ehero-sparkman', 3],
-  ['warrior-dai-grepher', 2],
-  ['celtic-guardian', 2],
-  ['dark-blade', 2],
-  ['giant-soldier-of-stone', 2],
-  ['mystical-elf', 1],
-  ['ehero-neos', 1],
-  ['summoned-skull', 1],
-];
+export type DeckId = keyof typeof decksJson;
 
-export const OBELISK_STUDENT_DECK: DeckList = [
-  ['luster-dragon', 2],
-  ['gemini-elf', 2],
-  ['vorse-raider', 2],
-  ['battle-ox', 2],
-  ['la-jinn', 2],
-  ['x-head-cannon', 2],
-  ['archfiend-soldier', 2],
-  ['mystical-elf', 2],
-  ['giant-soldier-of-stone', 1],
-  ['cyber-tech-alligator', 2],
-  ['blue-eyes-white-dragon', 1],
-];
+export const DECKS: Readonly<Record<DeckId, DeckDef>> = decksJson;
 
-export const DECKS = {
-  starter: STARTER_DECK,
-  obeliskStudent: OBELISK_STUDENT_DECK,
-} as const;
+export const DECK_MIN_SIZE = 40;
+export const DECK_MAX_SIZE = 60;
+export const MAX_COPIES = 3;
 
-export type DeckId = keyof typeof DECKS;
+export function buildDeck(id: DeckId): Card[] {
+  return Object.entries(DECKS[id].cards).flatMap(([cardId, copies]) => {
+    const card = getCard(cardId);
+    if (!isPlayable(card)) throw new Error(`O motor de duelo ainda não sabe jogar ${card.nameEn} (deck ${id}).`);
+    return Array.from({ length: copies }, () => card);
+  });
+}
