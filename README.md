@@ -10,6 +10,7 @@ Requer Node.js 22 ou mais recente (desenvolvido no 24).
 
 ```bash
 npm install
+npm run art:import   # opcional: baixa as ilustrações das cartas (não ficam no repositório)
 npm run dev
 ```
 
