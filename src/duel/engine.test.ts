@@ -1,12 +1,26 @@
 import { describe, expect, it } from 'vitest';
 import { runAiStep } from './ai';
-import { buildDeck, DECKS } from './cards';
-import { Duel, DuelError, tributesRequired, type DuelOptions } from './engine';
+import { buildDeck } from './cards';
+import { Duel, DuelError, type DuelOptions, tributesRequired } from './engine';
 import { mulberry32 } from './rng';
 import type { MonsterCard } from './types';
 
 function monster(name: string, level: number, atk: number, def: number): MonsterCard {
-  return { id: name.toLowerCase(), kind: 'monster', name, level, atk, def, attribute: 'EARTH', type: 'Warrior' };
+  return {
+    id: name.toLowerCase(),
+    passcode: 1,
+    name,
+    nameEn: name,
+    text: '',
+    kind: 'monster',
+    frame: 'normal',
+    level,
+    atk,
+    def,
+    attribute: 'EARTH',
+    type: 'Warrior',
+    abilities: [],
+  };
 }
 
 const FILLER = monster('Filler', 4, 500, 500);
@@ -29,8 +43,8 @@ describe('início do duelo', () => {
   it('distribui a mão inicial e o primeiro jogador compra uma carta', () => {
     const duel = new Duel(
       [
-        { name: 'P0', deck: buildDeck(DECKS.starter) },
-        { name: 'P1', deck: buildDeck(DECKS.obeliskStudent) },
+        { name: 'P0', deck: buildDeck('starter') },
+        { name: 'P1', deck: buildDeck('obeliskStudent') },
       ],
       { rng: mulberry32(1) },
     );
@@ -39,7 +53,7 @@ describe('início do duelo', () => {
     expect(duel.turn).toBe(1);
     expect(duel.players[0].hand).toHaveLength(6);
     expect(duel.players[1].hand).toHaveLength(5);
-    expect(duel.players[0].deck).toHaveLength(14);
+    expect(duel.players[0].deck).toHaveLength(34);
     expect(events.map((event) => event.type)).toEqual(['turnStart', 'draw']);
   });
 
@@ -204,8 +218,8 @@ describe('IA', () => {
     for (let seed = 1; seed <= 25; seed++) {
       const duel = new Duel(
         [
-          { name: 'P0', deck: buildDeck(DECKS.starter) },
-          { name: 'P1', deck: buildDeck(DECKS.obeliskStudent) },
+          { name: 'P0', deck: buildDeck('starter') },
+          { name: 'P1', deck: buildDeck('obeliskStudent') },
         ],
         { rng: mulberry32(seed), startingLP: 4000 },
       );
@@ -216,7 +230,9 @@ describe('IA', () => {
         runAiStep(duel);
         expect(++steps).toBeLessThan(2000);
       }
-      expect(duel.players[duel.winner === 0 ? 1 : 0].lp === 0 || duel.players.some((p) => p.deck.length === 0)).toBe(true);
+      expect(duel.players[duel.winner === 0 ? 1 : 0].lp === 0 || duel.players.some((p) => p.deck.length === 0)).toBe(
+        true,
+      );
     }
   });
 });
