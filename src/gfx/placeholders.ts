@@ -1,6 +1,6 @@
-import Phaser from 'phaser';
+import type Phaser from 'phaser';
 import { TILE_SIZE } from '../config';
-import { Tile, TILE_COUNT } from '../world/tiles';
+import { TILE_COUNT, Tile } from '../world/tiles';
 
 /**
  * Arte provisória desenhada por código, para o protótipo rodar sem nenhum
@@ -31,8 +31,21 @@ function fill(ctx: Ctx, color: string): void {
 
 function grass(ctx: Ctx): void {
   fill(ctx, '#68c070');
-  for (const [x, y] of [[2, 3], [10, 2], [6, 8], [13, 10], [3, 13]] as const) rect(ctx, '#88d888', x, y, 2, 1);
-  for (const [x, y] of [[7, 4], [12, 6], [1, 9], [9, 13]] as const) rect(ctx, '#50a060', x, y);
+  for (const [x, y] of [
+    [2, 3],
+    [10, 2],
+    [6, 8],
+    [13, 10],
+    [3, 13],
+  ] as const)
+    rect(ctx, '#88d888', x, y, 2, 1);
+  for (const [x, y] of [
+    [7, 4],
+    [12, 6],
+    [1, 9],
+    [9, 13],
+  ] as const)
+    rect(ctx, '#50a060', x, y);
 }
 
 function roof(ctx: Ctx, base: string, shade: string): void {
@@ -52,7 +65,14 @@ const TILE_PAINTERS: Record<Tile, (ctx: Ctx) => void> = {
   [Tile.Grass]: grass,
   [Tile.Path]: (ctx) => {
     fill(ctx, '#e0c890');
-    for (const [x, y] of [[3, 2], [11, 5], [6, 10], [13, 13], [1, 12]] as const) rect(ctx, '#c8ac70', x, y, 2, 1);
+    for (const [x, y] of [
+      [3, 2],
+      [11, 5],
+      [6, 10],
+      [13, 13],
+      [1, 12],
+    ] as const)
+      rect(ctx, '#c8ac70', x, y, 2, 1);
   },
   [Tile.Water]: (ctx) => {
     fill(ctx, '#4090e8');
@@ -72,7 +92,11 @@ const TILE_PAINTERS: Record<Tile, (ctx: Ctx) => void> = {
   },
   [Tile.Flower]: (ctx) => {
     grass(ctx);
-    for (const [x, y, color] of [[3, 4, '#f05050'], [10, 6, '#f8f8f8'], [6, 11, '#f8d030']] as const) {
+    for (const [x, y, color] of [
+      [3, 4, '#f05050'],
+      [10, 6, '#f8f8f8'],
+      [6, 11, '#f8d030'],
+    ] as const) {
       rect(ctx, color, x, y, 3, 3);
       rect(ctx, '#f8e8a0', x + 1, y + 1);
     }
